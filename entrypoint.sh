@@ -125,6 +125,7 @@ else
   FLAGS="$FLAGS --login puredb:${PFTPD_PUREDB}"
   touch "${PFTPD_PUREDB}" "${PFTPD_PASSWD}"
   pure-pw mkdb "${PFTPD_PUREDB}" -f "${PFTPD_PASSWD}"
+  echo "Use PureDB authentication method"
 fi
 
 echo "Flags"

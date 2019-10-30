@@ -5,7 +5,7 @@
   <a href="https://github.com/crazy-max/docker-pure-ftpd/actions?workflow=build"><img src="https://github.com/crazy-max/docker-pure-ftpd/workflows/build/badge.svg" alt="Build Status"></a>
   <a href="https://hub.docker.com/r/crazymax/pure-ftpd/"><img src="https://img.shields.io/docker/stars/crazymax/pure-ftpd.svg?style=flat-square" alt="Docker Stars"></a>
   <a href="https://hub.docker.com/r/crazymax/pure-ftpd/"><img src="https://img.shields.io/docker/pulls/crazymax/pure-ftpd.svg?style=flat-square" alt="Docker Pulls"></a>
-  <a href="https://www.codacy.com/app/crazy-max/docker-pure-ftpd"><img src="https://img.shields.io/codacy/grade/826c85b3ae99486e80784380422bcd0e.svg?style=flat-square" alt="Code Quality"></a>
+  <a href="https://www.codacy.com/app/crazy-max/docker-pure-ftpd"><img src="https://img.shields.io/codacy/grade/f897b01327ba4b4c9fcb23e33c0a65b6.svg?style=flat-square" alt="Code Quality"></a>
   <br /><a href="https://www.patreon.com/crazymax"><img src="https://img.shields.io/badge/donate-patreon-f96854.svg?logo=patreon&style=flat-square" alt="Support me on Patreon"></a>
   <a href="https://www.paypal.me/crazyws"><img src="https://img.shields.io/badge/donate-paypal-00457c.svg?logo=paypal&style=flat-square" alt="Donate Paypal"></a>
 </p>
@@ -114,10 +114,6 @@ This image uses flags instead of the configuration file to set Pure-FTPd. Some [
 
 `SECURE_MODE` enables [specially crafted flags](entrypoint.sh#L40-L52) to enforced security of Pure-FTPd.
 
-### Logs
-
-Logs are diplayed through `stdout` using syslog-ng. You can increase verbosity with `-d -d` flags.
-
 ### PureDB authentication method
 
 Using [PureDB](examples/puredb) authentication method, the container will create a blank password file in `/data/pureftpd.passwd` and a initialize a PureDB database in `/data/pureftpd.pdb`. If a password file is already available, it will be read on startup and the PureDB database will be updated.
@@ -186,6 +182,44 @@ Like MySQL, there is also a [quick example](examples/postgresql) to use PostgreS
 In the [docker compose example](examples/postgresql) available, the database and the [users table](examples/postgresql/users.sql) will be also created at first launch.
 
 > More info about PostgreSQL authentication method: https://github.com/jedisct1/pure-ftpd/blob/master/README.PGSQL
+
+### Logs
+
+Logs are displayed through `stdout` using syslog-ng. You can increase verbosity with `-d -d` flags.
+
+```
+$ docker-compose logs -f pureftpd
+Attaching to pureftpd
+pureftpd    | Use MySQL authentication method
+pureftpd    | Waiting 45s for MySQL database to be ready...
+pureftpd    | MySQL database ready!
+pureftpd    | Flags
+pureftpd    |   Secure: --maxclientsnumber 5 --maxclientsperip 5 --antiwarez --customerproof --dontresolve --norename --prohibitdotfilesread --prohibitdotfileswrite
+pureftpd    |   Additional: -d -d
+pureftpd    |   All: -d -d --bind 0.0.0.0,2100 --ipv4only --passiveportrange 30000:30009 --noanonymous --createhomedir --nochmod --syslogfacility ftp --forcepassiveip 10.0.0.5 --maxclientsnumber 5 --maxclientsperip 5 --antiwarez --customerproof --dontresolve --norename --prohibitdotfilesread --prohibitdotfileswrite --login mysql:/data/pureftpd-mysql.conf
+pureftpd    | 2019-10-30 02:56:30,557 INFO Included extra file "/etc/supervisord/pure-ftpd.conf" during parsing
+pureftpd    | 2019-10-30 02:56:30,557 INFO Included extra file "/etc/supervisord/syslog-ng.conf" during parsing
+pureftpd    | 2019-10-30 02:56:30,557 INFO Set uid to user 0 succeeded
+pureftpd    | 2019-10-30 02:56:30,560 INFO supervisord started with pid 1
+pureftpd    | 2019-10-30 02:56:31,563 INFO spawned: 'syslog-ng' with pid 20
+pureftpd    | 2019-10-30 02:56:31,566 INFO spawned: 'pure-ftpd' with pid 21
+pureftpd    | 2019-10-30 02:56:32,582 INFO success: syslog-ng entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+pureftpd    | 2019-10-30 02:56:32,583 INFO success: pure-ftpd entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [INFO] New connection from 10.0.0.1
+pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [DEBUG] 220---------- Welcome to Pure-FTPd [privsep] [TLS] ----------
+pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [DEBUG] 220-You are user number 1 of 5 allowed.
+pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [DEBUG] 220-Local time is now 02:56. Server port: 2100.
+pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [DEBUG] 220-This is a private system - No anonymous login
+pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [DEBUG] 220 You will be disconnected after 15 minutes of inactivity.
+pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [DEBUG] Command [user] [foo]
+pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [DEBUG] 331 User foo OK. Password required
+pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [DEBUG] Command [pass] [<*>]
+pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [INFO] foo is now logged in
+pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (foo@10.0.0.1) [DEBUG] 230 OK. Current directory is /home/foo
+pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (foo@10.0.0.1) [DEBUG] Command [syst] []
+pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (foo@10.0.0.1) [DEBUG] 215 UNIX Type: L8
+...
+```
 
 ## How can I help ?
 
