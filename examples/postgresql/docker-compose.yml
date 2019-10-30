@@ -1,0 +1,36 @@
+version: "3.5"
+
+services:
+  db:
+    image: postgres:9.6
+    container_name: pureftpd_db
+    volumes:
+      - "./db:/var/lib/postgresql/data"
+      - "./users.sql:/docker-entrypoint-initdb.d/users.sql"
+    environment:
+      - "TZ=Europe/Paris"
+      - "POSTGRES_DB=pureftpd"
+      - "POSTGRES_USER=postgres"
+      - "POSTGRES_PASSWORD=asupersecretpassword"
+    restart: always
+
+  pureftpd:
+    image: crazymax/pure-ftpd
+    container_name: pureftpd
+    networks:
+      - pureftpd
+    depends_on:
+      - db
+    ports:
+      - "2100:2100"
+      - "30000-30009:30000-30009"
+    volumes:
+      - "./data:/data"
+    environment:
+      - "TZ=Europe/Paris"
+      - "AUTH_METHOD=pgsql"
+    restart: always
+
+networks:
+  pureftpd:
+    name: pureftpd

@@ -1,0 +1,39 @@
+version: "3.5"
+
+services:
+  db:
+    image: mariadb:10.4
+    container_name: pureftpd_db
+    networks:
+      - pureftpd
+    volumes:
+      - "./db:/var/lib/mysql"
+      - "./users.sql:/docker-entrypoint-initdb.d/users.sql"
+    environment:
+      - "TZ=Europe/Paris"
+      - "MYSQL_ALLOW_EMPTY_PASSWORD=yes"
+      - "MYSQL_DATABASE=pureftpd"
+      - "MYSQL_USER=pureftpd"
+      - "MYSQL_PASSWORD=asupersecretpassword"
+    restart: always
+
+  pureftpd:
+    image: crazymax/pure-ftpd
+    container_name: pureftpd
+    networks:
+      - pureftpd
+    depends_on:
+      - db
+    ports:
+      - "2100:2100"
+      - "30000-30009:30000-30009"
+    volumes:
+      - "./data:/data"
+    environment:
+      - "TZ=Europe/Paris"
+      - "AUTH_METHOD=mysql"
+    restart: always
+
+networks:
+  pureftpd:
+    name: pureftpd

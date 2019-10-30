@@ -1,0 +1,15 @@
+version: "3.2"
+
+services:
+  pureftpd:
+    image: crazymax/pure-ftpd
+    container_name: pureftpd
+    ports:
+      - "2100:2100"
+      - "30000-30009:30000-30009"
+    volumes:
+      - "./data:/data"
+    environment:
+      - "TZ=Europe/Paris"
+      - "AUTH_METHOD=puredb"
+    restart: always
