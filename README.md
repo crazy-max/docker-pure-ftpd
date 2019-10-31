@@ -21,7 +21,7 @@ If you are interested, [check out](https://hub.docker.com/r/crazymax/) my other 
 
 * Multi-platform image
 * [PureDB](#puredb-authentication-method), [MySQL](#mysql-authentication-method), [PostgreSQL](examples/postgresql) and LDAP support
-* Latest [Pure-FTPd](https://github.com/qbittorrent/qBittorrent) release compiled from source
+* Latest [Pure-FTPd](https://github.com/jedisct1/pure-ftpd) release compiled from source
 * Support of `argon2` and `scrypt` hashing method through [Libsodium](https://libsodium.org/)
 * Logs processed to `stdout` through syslog-ng
 * `PASSIVE_IP` for PASV support automatically resolved
