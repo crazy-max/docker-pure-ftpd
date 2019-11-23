@@ -193,7 +193,7 @@ To get started, you can create a self-signed certificate with the following comm
 
 ```
 docker run --rm -it -v $(pwd)/data:/data crazymax/pure-ftpd \
-  openssl req -x509 -nodes -newkey rsa:2048 -sha256 -keyout /data/pureftpd.pem -out /data/pureftpd.pem && chmod 600 /data/pureftpd.pem
+  openssl req -x509 -nodes -newkey rsa:2048 -sha256 -keyout /data/pureftpd.pem -out /data/pureftpd.pem
 ```
 
 ### Logs
