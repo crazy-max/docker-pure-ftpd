@@ -15,6 +15,7 @@ PFTPD_PASSWD="/data/pureftpd.passwd"
 PFTPD_MYSQL_CONF="/data/pureftpd-mysql.conf"
 PFTPD_PGSQL_CONF="/data/pureftpd-pgsql.conf"
 PFTPD_LDAP_CONF="/data/pureftpd-ldap.conf"
+PFTPD_PEM="/data/pureftpd.pem"
 
 ADD_FLAGS=""
 if [ -f "${PFTPD_FLAGS}" ]; then
@@ -126,6 +127,11 @@ else
   touch "${PFTPD_PUREDB}" "${PFTPD_PASSWD}"
   pure-pw mkdb "${PFTPD_PUREDB}" -f "${PFTPD_PASSWD}"
   echo "Use PureDB authentication method"
+fi
+
+# Check TLS cert
+if [ -f "$PFTPD_PEM" ]; then
+  chmod 600 "$PFTPD_PEM"
 fi
 
 echo "Flags"

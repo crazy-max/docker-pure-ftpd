@@ -183,6 +183,19 @@ In the [docker compose example](examples/postgresql) available, the database and
 
 > More info about PostgreSQL authentication method: https://github.com/jedisct1/pure-ftpd/blob/master/README.PGSQL
 
+### TLS connection
+
+[TLS connections](https://github.com/jedisct1/pure-ftpd/blob/master/README.TLS) require certificates, as well as their key. Both can be bundled into a single file. If you have both a `.pem` file and a `.key` file, just concatenate the content of the `.key` file to the `.pem` file.
+
+The certificate needs to be located in `/data/pureftpd.pem` and `--tls <opt>` added to enable TLS connection.
+
+To get started, you can create a self-signed certificate with the following command:
+
+```
+docker run --rm -it -v $(pwd)/data:/data crazymax/pure-ftpd \
+  openssl req -x509 -nodes -newkey rsa:2048 -sha256 -keyout /data/pureftpd.pem -out /data/pureftpd.pem && chmod 600 /data/pureftpd.pem
+```
+
 ### Logs
 
 Logs are displayed through `stdout` using syslog-ng. You can increase verbosity with `-d -d` flags.

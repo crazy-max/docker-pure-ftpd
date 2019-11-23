@@ -43,6 +43,8 @@ RUN curl -sSL "https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${
     --with-ratios \
     --with-throttling \
     --with-tls \
+    --with-certfile=/data/pureftpd.pem \
+    --with-certfile=/data/pureftpd.pem \
   && make install-strip
 
 # syntax=docker/dockerfile:experimental
