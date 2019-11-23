@@ -16,6 +16,7 @@ PFTPD_MYSQL_CONF="/data/pureftpd-mysql.conf"
 PFTPD_PGSQL_CONF="/data/pureftpd-pgsql.conf"
 PFTPD_LDAP_CONF="/data/pureftpd-ldap.conf"
 PFTPD_PEM="/data/pureftpd.pem"
+PFTPD_DHPARAMS="/data/pureftpd-dhparams.pem"
 
 ADD_FLAGS=""
 if [ -f "${PFTPD_FLAGS}" ]; then
@@ -132,6 +133,10 @@ fi
 # Check TLS cert
 if [ -f "$PFTPD_PEM" ]; then
   chmod 600 "$PFTPD_PEM"
+fi
+if [ -f "$PFTPD_DHPARAMS" ]; then
+  chmod 600 "$PFTPD_DHPARAMS"
+  ln -sf "$PFTPD_DHPARAMS" "/etc/ssl/private/pure-ftpd-dhparams.pem"
 fi
 
 echo "Flags"
