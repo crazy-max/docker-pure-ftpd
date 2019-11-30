@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.49-RC3 (2019/11/30)
+
+* Enable cookie support
+* Enable upload script support
+* Enable support for charset conversion
+
 ## 1.0.49-RC2 (2019/11/23)
 
 * Better handling of TLS connection

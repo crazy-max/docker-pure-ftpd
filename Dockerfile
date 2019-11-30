@@ -34,6 +34,7 @@ RUN curl -sSL "https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${
     --prefix=/pure-ftpd \
     --without-humor \
     --with-altlog \
+    --with-cookie \
     --with-ftpwho \
     --with-ldap \
     --with-mysql \
@@ -41,8 +42,10 @@ RUN curl -sSL "https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${
     --with-puredb \
     --with-quotas \
     --with-ratios \
+    --with-rfc2640 \
     --with-throttling \
     --with-tls \
+    --with-uploadscript \
     --with-certfile=/data/pureftpd.pem \
     --with-certfile=/data/pureftpd.pem \
   && make install-strip
@@ -77,6 +80,7 @@ RUN apk --update --no-cache add \
     postgresql-client \
     supervisor \
     tzdata \
+    zlib \
   && apk --update --no-cache add --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main \
     syslog-ng \
   && rm -rf /tmp/* /var/cache/apk/*
