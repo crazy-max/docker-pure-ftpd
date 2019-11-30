@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.49-RC4 (2019/11/30)
+
+* Back to Pure-FTPd 1.0.49
+
 ## 1.0.48-RC1 (2019/11/30)
 
 * Pure-FTPd 1.0.48

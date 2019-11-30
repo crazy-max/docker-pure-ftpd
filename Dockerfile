@@ -25,7 +25,7 @@ RUN apk --update --no-cache add \
 
 COPY patchs /tmp/
 
-ENV PUREFTPD_VERSION="1.0.48"
+ENV PUREFTPD_VERSION="1.0.49"
 
 WORKDIR /tmp/pure-ftpd
 RUN curl -sSL "https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${PUREFTPD_VERSION}.tar.gz" | tar xz --strip 1 \
