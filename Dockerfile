@@ -33,6 +33,7 @@ RUN curl -sSL "https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${
   && ./configure \
     --prefix=/pure-ftpd \
     --without-humor \
+    --without-inetd \
     --with-altlog \
     --with-cookie \
     --with-ftpwho \
@@ -42,7 +43,6 @@ RUN curl -sSL "https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${
     --with-puredb \
     --with-quotas \
     --with-ratios \
-    --with-rfc2640 \
     --with-throttling \
     --with-tls \
     --with-uploadscript \

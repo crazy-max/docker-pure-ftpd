@@ -4,7 +4,7 @@
 
 * Enable cookie support
 * Enable upload script support
-* Enable support for charset conversion
+* Remove useless inetd support
 
 ## 1.0.49-RC2 (2019/11/23)
 
