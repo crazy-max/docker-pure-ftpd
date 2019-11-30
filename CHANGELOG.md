@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.47-RC1 (2019/11/30)
+
+* Pure-FTPd 1.0.47
+* Enable support for charset conversion
+
 ## 1.0.49-RC3 (2019/11/30)
 
 * Enable cookie support
