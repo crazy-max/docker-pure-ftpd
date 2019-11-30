@@ -15,7 +15,6 @@ RUN apk --update --no-cache add \
     binutils \
     build-base \
     curl \
-    gnu-libiconv \
     libsodium \
     mariadb-connector-c-dev \
     openldap-dev \
@@ -26,7 +25,7 @@ RUN apk --update --no-cache add \
 
 COPY patchs /tmp/
 
-ENV PUREFTPD_VERSION="1.0.47"
+ENV PUREFTPD_VERSION="1.0.48"
 
 WORKDIR /tmp/pure-ftpd
 RUN curl -sSL "https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${PUREFTPD_VERSION}.tar.gz" | tar xz --strip 1 \
@@ -44,7 +43,6 @@ RUN curl -sSL "https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${
     --with-puredb \
     --with-quotas \
     --with-ratios \
-    --with-rfc2640 \
     --with-throttling \
     --with-tls \
     --with-uploadscript \
@@ -72,7 +70,6 @@ LABEL maintainer="CrazyMax" \
 
 RUN apk --update --no-cache add \
     bind-tools \
-    gnu-libiconv \
     libldap \
     libpq \
     libsodium \

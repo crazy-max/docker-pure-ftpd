@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.48-RC1 (2019/11/30)
+
+* Pure-FTPd 1.0.48
+* Charset conversion not supported anymore (see jedisct1/pure-ftpd@33eda76)
+
 ## 1.0.47-RC1 (2019/11/30)
 
 * Pure-FTPd 1.0.47
