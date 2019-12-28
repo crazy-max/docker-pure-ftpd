@@ -52,7 +52,7 @@ Image: crazymax/pure-ftpd:latest
 * `AUTH_METHOD` : Authentication method to use. Can be `puredb`, `mysql`, `pgsql` or `ldap` (default `puredb`)
 * `SECURE_MODE` : Enable [secure mode](#secure-mode) (default `true`)
 * `PASSIVE_IP` : IP/Host for PASV support (default auto resolved with `dig +short myip.opendns.com @resolver1.opendns.com`)
-* `PASSIVE_PORT_RANGE` : Port range for passive connections (default `30000-30009`)
+* `PASSIVE_PORT_RANGE` : Port range for passive connections (default `30000:30009`)
 * `DB_TIMEOUT` : Time in seconds after which we stop trying to reach the database server. Only used for `mysql` and `pgsql` auth method (default `45`)
 
 ### Volumes
