@@ -3,6 +3,7 @@
 AUTH_METHOD=${AUTH_METHOD:-puredb}
 SECURE_MODE=${SECURE_MODE:-true}
 PASSIVE_IP=${PASSIVE_IP:-$(dig +short myip.opendns.com @resolver1.opendns.com)}
+PASSIVE_PORT_RANGE=${PASSIVE_PORT_RANGE:-30000:30100}
 DB_TIMEOUT=${DB_TIMEOUT:-45}
 
 extractFromConf() {
@@ -29,7 +30,7 @@ fi
 
 FLAGS="$FLAGS --bind 0.0.0.0,2100"
 FLAGS="$FLAGS --ipv4only"
-FLAGS="$FLAGS --passiveportrange 30000:30009"
+FLAGS="$FLAGS --passiveportrange ${PASSIVE_PORT_RANGE}"
 FLAGS="$FLAGS --noanonymous"
 FLAGS="$FLAGS --createhomedir"
 FLAGS="$FLAGS --nochmod"

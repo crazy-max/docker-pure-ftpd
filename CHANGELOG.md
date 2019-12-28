@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.49-RC5 / 1.0.47-RC2 (2019/12/28)
+
+* Add `PASSIVE_PORT_RANGE` env var
+* Alpine 3.11
+
 ## 1.0.49-RC4 (2019/11/30)
 
 * Back to Pure-FTPd 1.0.49

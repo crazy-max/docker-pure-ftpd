@@ -52,6 +52,7 @@ Image: crazymax/pure-ftpd:latest
 * `AUTH_METHOD` : Authentication method to use. Can be `puredb`, `mysql`, `pgsql` or `ldap` (default `puredb`)
 * `SECURE_MODE` : Enable [secure mode](#secure-mode) (default `true`)
 * `PASSIVE_IP` : IP/Host for PASV support (default auto resolved with `dig +short myip.opendns.com @resolver1.opendns.com`)
+* `PASSIVE_PORT_RANGE` : Port range for passive connections (default `30000-30009`)
 * `DB_TIMEOUT` : Time in seconds after which we stop trying to reach the database server. Only used for `mysql` and `pgsql` auth method (default `45`)
 
 ### Volumes
@@ -100,7 +101,7 @@ docker-compose up -d
 
 ### Flags
 
-This image uses flags instead of the configuration file to set Pure-FTPd. Some [flags are forced](entrypoint.sh#L28-L34) but you can pass additional flags in `/data/pureftpd.flags` file:
+This image uses flags instead of the configuration file to set Pure-FTPd. Some [flags are forced](entrypoint.sh#L31-L37) but you can pass additional flags in `/data/pureftpd.flags` file:
 
 ```
 -d
@@ -112,7 +113,7 @@ This image uses flags instead of the configuration file to set Pure-FTPd. Some [
 
 ### Secure mode
 
-`SECURE_MODE` enables [specially crafted flags](entrypoint.sh#L40-L52) to enforced security of Pure-FTPd.
+`SECURE_MODE` enables [specially crafted flags](entrypoint.sh#L43-L55) to enforced security of Pure-FTPd.
 
 ### PureDB authentication method
 
