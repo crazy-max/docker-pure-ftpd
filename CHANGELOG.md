@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.49-RC6 / 1.0.47-RC3 (2020/03/23)
+
+* Typo (#3)
+
 ## 1.0.49-RC5 / 1.0.47-RC2 (2019/12/28)
 
 * Add `PASSIVE_PORT_RANGE` env var
