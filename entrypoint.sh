@@ -85,7 +85,7 @@ if [ "$AUTH_METHOD" = "mysql" ]; then
 
 # PostgreSQL auth
 elif [ "$AUTH_METHOD" = "pgsql" ]; then
-  FLAGS="$FLAGS --login pgsql:${PFTPD_PGSQL_CONF}"p
+  FLAGS="$FLAGS --login pgsql:${PFTPD_PGSQL_CONF}"
   if [ ! -f "${PFTPD_PGSQL_CONF}" ]; then
     >&2 echo "ERROR: ${PFTPD_PGSQL_CONF} does not exist"
     exit 1
