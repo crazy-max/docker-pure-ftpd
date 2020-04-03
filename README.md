@@ -182,6 +182,12 @@ Like MySQL, there is also a [quick example](examples/postgresql) to use PostgreS
 
 In the [docker compose example](examples/postgresql) available, the database and the [users table](examples/postgresql/users.sql) will be also created at first launch.
 
+How add new user with encrypted password?
+```sql
+CREATE EXTENSION pgcrypto;
+INSERT INTO "users" ("User", "Password", "Dir") VALUES ('foo', crypt('mypassword', gen_salt('bf')), '/home/foo');
+```
+
 > More info about PostgreSQL authentication method: https://github.com/jedisct1/pure-ftpd/blob/master/README.PGSQL
 
 ### TLS connection
