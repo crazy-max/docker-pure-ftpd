@@ -1,5 +1,6 @@
 #!/bin/sh
 
+TZ=${TZ:-UTC}
 AUTH_METHOD=${AUTH_METHOD:-puredb}
 SECURE_MODE=${SECURE_MODE:-true}
 PASSIVE_IP=${PASSIVE_IP:-$(dig +short myip.opendns.com @resolver1.opendns.com)}
@@ -53,6 +54,11 @@ if [ "$SECURE_MODE" = "true" ]; then
   SECURE_FLAGS="$SECURE_FLAGS --prohibitdotfileswrite"
   FLAGS="$FLAGS$SECURE_FLAGS"
 fi
+
+# Timezone
+echo "Setting timezone to ${TZ}..."
+ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime
+echo ${TZ} > /etc/timezone
 
 # MySQL auth
 if [ "$AUTH_METHOD" = "mysql" ]; then
