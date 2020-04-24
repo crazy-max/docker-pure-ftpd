@@ -3,6 +3,7 @@
 ## 1.0.49-RC7 / 1.0.47-RC4 (2020/04/24)
 
 * Fix timezone (#5)
+* Switch to Open Container Specification labels as label-schema.org ones are deprecated
 
 ## 1.0.49-RC6 / 1.0.47-RC3 (2020/03/23)
 
