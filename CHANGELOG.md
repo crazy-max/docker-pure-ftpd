@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.49-RC8 / 1.0.47-RC5 (2020/04/24)
+
+* Don't keep timestamp on syslog-ng (#5)
+
 ## 1.0.49-RC7 / 1.0.47-RC4 (2020/04/24)
 
 * Fix timezone (#5)
