@@ -87,13 +87,14 @@ RUN apk --update --no-cache add \
 
 COPY --from=builder /pure-ftpd /
 COPY entrypoint.sh /entrypoint.sh
+COPY stop-supervisor.sh /stop-supervisor.sh
 COPY assets /
 
 ENV PURE_PASSWDFILE="/data/pureftpd.passwd" \
   PURE_DBFILE="/data/pureftpd.pdb" \
   TZ="UTC"
 
-RUN chmod a+x /entrypoint.sh \
+RUN chmod a+x /entrypoint.sh /stop-supervisor.sh \
   && mkdir -p /data
 
 EXPOSE 2100 30000-30009
