@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.49-RC10 / 1.0.47-RC7 (2020/05/21)
+
+* Add finish script for s6 service (#6)
+* Do not fail if `UPLOADSCRIPT` is empty
+
 ## 1.0.49-RC9 / 1.0.47-RC6 (2020/05/21)
 
 * Support of `pure-uploadscript` (#8)
