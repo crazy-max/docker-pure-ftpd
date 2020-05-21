@@ -29,7 +29,7 @@ jobs:
           echo ::set-output name=build_tag::test
           echo ::set-output name=container_name::pure-ftpd
           echo ::set-output name=running_timeout::120
-          echo ::set-output name=running_log_check::pure-ftpd entered RUNNING state
+          echo ::set-output name=running_log_check::[services.d] done
       -
         name: Checkout
         uses: actions/checkout@v2
