@@ -90,7 +90,7 @@ RUN apk --update --no-cache add \
 
 COPY --from=builder /pure-ftpd /
 COPY entrypoint.sh /entrypoint.sh
-COPY assets /
+COPY rootfs /
 
 ENV PURE_PASSWDFILE="/data/pureftpd.passwd" \
   PURE_DBFILE="/data/pureftpd.pdb" \

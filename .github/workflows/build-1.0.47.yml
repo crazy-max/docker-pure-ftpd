@@ -6,8 +6,8 @@ on:
     tags: '1.0.47-*'
     paths:
       - '.github/workflows/build.yml'
-      - 'assets/**'
       - 'patchs/**'
+      - 'rootfs/**'
       - 'Dockerfile-1.0.47'
       - 'entrypoint.sh'
 

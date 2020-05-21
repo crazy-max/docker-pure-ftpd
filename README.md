@@ -88,7 +88,7 @@ $ docker run -d --name pure-ftpd \
   crazymax/pure-ftpd
 ```
 
-## Update
+## Upgrade
 
 Recreate the container whenever I push an update:
 
@@ -101,7 +101,7 @@ docker-compose up -d
 
 ### Flags
 
-This image uses flags instead of the configuration file to set Pure-FTPd. Some [flags are forced](entrypoint.sh#L31-L37) but you can pass additional flags in `/data/pureftpd.flags` file:
+This image uses flags instead of the configuration file to set Pure-FTPd. Some [flags are forced](https://github.com/crazy-max/docker-pure-ftpd/blob/55c6f6f0857536faf2d93f8d8227c6fec84200ec/entrypoint.sh#L32-L38) but you can pass additional flags in `/data/pureftpd.flags` file:
 
 ```
 -d
@@ -113,7 +113,7 @@ This image uses flags instead of the configuration file to set Pure-FTPd. Some [
 
 ### Secure mode
 
-`SECURE_MODE` enables [specially crafted flags](entrypoint.sh#L43-L55) to enforced security of Pure-FTPd.
+`SECURE_MODE` enables [specially crafted flags](https://github.com/crazy-max/docker-pure-ftpd/blob/55c6f6f0857536faf2d93f8d8227c6fec84200ec/entrypoint.sh#L44-L56) to enforced security of Pure-FTPd.
 
 ### PureDB authentication method
 

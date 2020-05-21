@@ -5,16 +5,16 @@ on:
     branches: master
     paths:
       - '.github/workflows/test.yml'
-      - 'assets/**'
       - 'patchs/**'
+      - 'rootfs/**'
       - 'Dockerfile'
       - 'entrypoint.sh'
   push:
     branches: master
     paths:
       - '.github/workflows/test.yml'
-      - 'assets/**'
       - 'patchs/**'
+      - 'rootfs/**'
       - 'Dockerfile'
       - 'entrypoint.sh'
 
