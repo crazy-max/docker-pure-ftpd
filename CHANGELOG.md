@@ -2,7 +2,7 @@
 
 ## 1.0.49-RC9 / 1.0.47-RC6 (2020/05/21)
 
-* Support of `pure-uploadscript`
+* Support of `pure-uploadscript` (#8)
 * Fix broken realpath
 * Switch to [s6-overlay](https://github.com/just-containers/s6-overlay/) as process supervisor
 * No need pam support
