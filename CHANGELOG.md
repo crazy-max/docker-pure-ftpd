@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.49-RC9 / 1.0.47-RC6 (2020/05/21)
+
+* Switch to [s6-overlay](https://github.com/just-containers/s6-overlay/) as process supervisor
+* No need pam support
+
 ## 1.0.49-RC8 / 1.0.47-RC5 (2020/04/24)
 
 * Don't keep timestamp on syslog-ng (#5)

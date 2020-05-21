@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/with-contenv sh
 
 TZ=${TZ:-UTC}
 AUTH_METHOD=${AUTH_METHOD:-puredb}
@@ -118,7 +118,7 @@ elif [ "$AUTH_METHOD" = "pgsql" ]; then
     fi;
   done
   echo "PostgreSQL database ready!"
-  unset DB_USER DB_PASSWORD DB_CMD
+  unset DB_USER DB_PASSWORD DB_CMD PGPASSWORD
 
 # LDAP auth
 elif [ "$AUTH_METHOD" = "ldap" ]; then
@@ -151,5 +151,4 @@ echo "  Secure:$SECURE_FLAGS"
 echo "  Additional:$ADD_FLAGS"
 echo "  All:$FLAGS"
 
-export PUREFTPD_FLAGS="$FLAGS"
-exec "$@"
+printf "%s" "$FLAGS" > /var/run/s6/container_environment/PUREFTPD_FLAGS

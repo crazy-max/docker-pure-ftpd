@@ -81,27 +81,36 @@ RUN apk --update --no-cache add \
     openldap-clients \
     openssl \
     postgresql-client \
-    supervisor \
     tzdata \
     zlib \
-  && apk --update --no-cache add --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main \
-    syslog-ng \
+  && S6_ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
+    "linux/amd64")   echo "amd64"   ;; \
+    "linux/arm/v6")  echo "arm"     ;; \
+    "linux/arm/v7")  echo "armhf"   ;; \
+    "linux/arm64")   echo "aarch64" ;; \
+    "linux/386")     echo "x86"     ;; \
+    "linux/ppc64le") echo "ppc64le" ;; \
+    *)               echo ""        ;; esac) \
+  && echo "S6_ARCH=$S6_ARCH" \
+  && wget -q "https://github.com/just-containers/s6-overlay/releases/latest/download/s6-overlay-${S6_ARCH}.tar.gz" -qO "/tmp/s6-overlay-${S6_ARCH}.tar.gz" \
+  && tar xzf /tmp/s6-overlay-${S6_ARCH}.tar.gz -C / \
+  && s6-echo "s6-overlay installed" \
+  && wget -q "https://github.com/just-containers/socklog-overlay/releases/latest/download/socklog-overlay-${S6_ARCH}.tar.gz" -qO "/tmp/socklog-overlay-${S6_ARCH}.tar.gz" \
+  && tar xzf /tmp/socklog-overlay-${S6_ARCH}.tar.gz -C / \
+  && rm -f /etc/socklog.rules/* \
   && rm -rf /tmp/* /var/cache/apk/*
 
 COPY --from=builder /pure-ftpd /
-COPY entrypoint.sh /entrypoint.sh
 COPY rootfs /
 
 ENV PURE_PASSWDFILE="/data/pureftpd.passwd" \
   PURE_DBFILE="/data/pureftpd.pdb" \
   TZ="UTC"
 
-RUN chmod a+x /entrypoint.sh \
-  && mkdir -p /data
+RUN mkdir -p /data
 
 EXPOSE 2100 30000-30009
 WORKDIR /data
 VOLUME [ "/data" ]
 
-ENTRYPOINT [ "/entrypoint.sh" ]
-CMD [ "/usr/bin/supervisord", "-c", "/etc/supervisord.conf" ]
+ENTRYPOINT [ "/init" ]

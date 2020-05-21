@@ -17,6 +17,30 @@ If you are interested, [check out](https://hub.docker.com/r/crazymax/) my other 
 
 💡 Want to be notified of new releases? Check out 🔔 [Diun (Docker Image Update Notifier)](https://github.com/crazy-max/diun) project!
 
+___
+
+* [Features](#features)
+* [Docker](#docker)
+  * [Multi-platform image](#multi-platform-image)
+  * [Environment variables](#environment-variables)
+  * [Volumes](#volumes)
+  * [Ports](#ports)
+* [Usage](#usage)
+  * [Docker Compose](#docker-compose)
+  * [Command line](#command-line)
+* [Upgrade](#upgrade)
+* [Notes](#notes)
+  * [Flags](#flags)
+  * [Secure mode](#secure-mode)
+  * [PureDB authentication method](#puredb-authentication-method)
+  * [Persist FTP user home](#persist-ftp-user-home)
+  * [MySQL authentication method](#mysql-authentication-method)
+  * [PostgreSQL authentication method](#postgresql-authentication-method)
+  * [TLS connection](#tls-connection)
+  * [Logs](#logs)
+* [How can I help?](#how-can-i-help)
+* [License](#license)
+
 ## Features
 
 * Multi-platform image
@@ -25,6 +49,7 @@ If you are interested, [check out](https://hub.docker.com/r/crazymax/) my other 
 * Support of `argon2` and `scrypt` hashing method through [Libsodium](https://libsodium.org/)
 * Logs processed to `stdout` through syslog-ng
 * `PASSIVE_IP` for PASV support automatically resolved
+* [s6-overlay](https://github.com/just-containers/s6-overlay/) as process supervisor
 
 ## Docker
 
@@ -43,26 +68,25 @@ Image: crazymax/pure-ftpd:latest
    - linux/arm64
    - linux/386
    - linux/ppc64le
-   - linux/s390x
 ```
 
 ### Environment variables
 
-* `TZ` : Timezone assigned to the container (default `UTC`)
-* `AUTH_METHOD` : Authentication method to use. Can be `puredb`, `mysql`, `pgsql` or `ldap` (default `puredb`)
-* `SECURE_MODE` : Enable [secure mode](#secure-mode) (default `true`)
-* `PASSIVE_IP` : IP/Host for PASV support (default auto resolved with `dig +short myip.opendns.com @resolver1.opendns.com`)
-* `PASSIVE_PORT_RANGE` : Port range for passive connections (default `30000:30009`)
-* `DB_TIMEOUT` : Time in seconds after which we stop trying to reach the database server. Only used for `mysql` and `pgsql` auth method (default `45`)
+* `TZ`: Timezone assigned to the container (default `UTC`)
+* `AUTH_METHOD`: Authentication method to use. Can be `puredb`, `mysql`, `pgsql` or `ldap` (default `puredb`)
+* `SECURE_MODE`: Enable [secure mode](#secure-mode) (default `true`)
+* `PASSIVE_IP`: IP/Host for PASV support (default auto resolved with `dig +short myip.opendns.com @resolver1.opendns.com`)
+* `PASSIVE_PORT_RANGE`: Port range for passive connections (default `30000:30009`)
+* `DB_TIMEOUT`: Time in seconds after which we stop trying to reach the database server. Only used for `mysql` and `pgsql` auth method (default `45`)
 
 ### Volumes
 
-* `/data` : Contains config files and PureDB file
+* `/data`: Contains config files and PureDB file
 
 ### Ports
 
-* `2100` : FTP port
-* `30000-30009` : PASV port range
+* `2100`: FTP port
+* `30000-30009`: PASV port range
 
 ## Usage
 
@@ -212,38 +236,35 @@ Logs are displayed through `stdout` using syslog-ng. You can increase verbosity 
 ```
 $ docker-compose logs -f pureftpd
 Attaching to pureftpd
-pureftpd    | Use MySQL authentication method
-pureftpd    | Waiting 45s for MySQL database to be ready...
-pureftpd    | MySQL database ready!
+pureftpd    | [s6-init] making user provided files available at /var/run/s6/etc...exited 0.
+pureftpd    | [s6-init] ensuring user provided files have correct perms...exited 0.
+pureftpd    | [fix-attrs.d] applying ownership & permissions fixes...
+pureftpd    | [fix-attrs.d] done.
+pureftpd    | [cont-init.d] executing container initialization scripts...
+pureftpd    | [cont-init.d] 01-config.sh: executing...
+pureftpd    | Setting timezone to America/Edmonton...
+pureftpd    | Use PureDB authentication method
 pureftpd    | Flags
-pureftpd    |   Secure: --maxclientsnumber 5 --maxclientsperip 5 --antiwarez --customerproof --dontresolve --norename --prohibitdotfilesread --prohibitdotfileswrite
-pureftpd    |   Additional: -d -d
-pureftpd    |   All: -d -d --bind 0.0.0.0,2100 --ipv4only --passiveportrange 30000:30009 --noanonymous --createhomedir --nochmod --syslogfacility ftp --forcepassiveip 10.0.0.5 --maxclientsnumber 5 --maxclientsperip 5 --antiwarez --customerproof --dontresolve --norename --prohibitdotfilesread --prohibitdotfileswrite --login mysql:/data/pureftpd-mysql.conf
-pureftpd    | 2019-10-30 02:56:30,557 INFO Included extra file "/etc/supervisord/pure-ftpd.conf" during parsing
-pureftpd    | 2019-10-30 02:56:30,557 INFO Included extra file "/etc/supervisord/syslog-ng.conf" during parsing
-pureftpd    | 2019-10-30 02:56:30,557 INFO Set uid to user 0 succeeded
-pureftpd    | 2019-10-30 02:56:30,560 INFO supervisord started with pid 1
-pureftpd    | 2019-10-30 02:56:31,563 INFO spawned: 'syslog-ng' with pid 20
-pureftpd    | 2019-10-30 02:56:31,566 INFO spawned: 'pure-ftpd' with pid 21
-pureftpd    | 2019-10-30 02:56:32,582 INFO success: syslog-ng entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
-pureftpd    | 2019-10-30 02:56:32,583 INFO success: pure-ftpd entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
-pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [INFO] New connection from 10.0.0.1
-pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [DEBUG] 220---------- Welcome to Pure-FTPd [privsep] [TLS] ----------
-pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [DEBUG] 220-You are user number 1 of 5 allowed.
-pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [DEBUG] 220-Local time is now 02:56. Server port: 2100.
-pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [DEBUG] 220-This is a private system - No anonymous login
-pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [DEBUG] 220 You will be disconnected after 15 minutes of inactivity.
-pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [DEBUG] Command [user] [foo]
-pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [DEBUG] 331 User foo OK. Password required
-pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [DEBUG] Command [pass] [<*>]
-pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (?@10.0.0.1) [INFO] foo is now logged in
-pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (foo@10.0.0.1) [DEBUG] 230 OK. Current directory is /home/foo
-pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (foo@10.0.0.1) [DEBUG] Command [syst] []
-pureftpd    | Oct 30 02:56:53 04b6e4ca4116 pure-ftpd: (foo@10.0.0.1) [DEBUG] 215 UNIX Type: L8
+pureftpd    |   Secure:
+pureftpd    |   Additional:
+pureftpd    |   All: --bind 0.0.0.0,2100 --ipv4only --passiveportrange 30000:30009 --noanonymous --createhomedir --nochmod --syslogfacility ftp --forcepassiveip 90.101.64.158 --login puredb:/data/pureftpd.pdb
+pureftpd    | [cont-init.d] 01-config.sh: exited 0.
+pureftpd    | [cont-init.d] 02-service.sh: executing...
+pureftpd    | [cont-init.d] 02-service.sh: exited 0.
+pureftpd    | [cont-init.d] 03-uploadscript.sh: executing...
+pureftpd    | [cont-init.d] 03-uploadscript.sh: exited 0.
+pureftpd    | [cont-init.d] ~-socklog: executing...
+pureftpd    | [cont-init.d] ~-socklog: exited 0.
+pureftpd    | [cont-init.d] done.
+pureftpd    | [services.d] starting services
+pureftpd    | [services.d] done.
+pureftpd    | ftp.info: May 21 18:09:56 pure-ftpd: (?@192.168.0.1) [INFO] New connection from 192.168.0.1
+pureftpd    | ftp.info: May 21 18:09:56 pure-ftpd: (?@192.168.0.1) [INFO] foo is now logged in
+pureftpd    | ftp.notice: May 21 18:10:17 pure-ftpd: (foo@192.168.0.1) [NOTICE] /home/foo//unlock.bin uploaded  (1024 bytes, 448.83KB/sec)
 ...
 ```
 
-## How can I help ?
+## How can I help?
 
 All kinds of contributions are welcome :raised_hands:! The most basic way to show your support is to star :star2: the project, or to raise issues :speech_balloon: You can also support this project by [**becoming a sponsor on GitHub**](https://github.com/sponsors/crazy-max) :clap: or by making a [Paypal donation](https://www.paypal.me/crazyws) to ensure this journey continues indefinitely! :rocket:
 
