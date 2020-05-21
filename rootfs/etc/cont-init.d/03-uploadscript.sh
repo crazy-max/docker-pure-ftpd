@@ -2,6 +2,9 @@
 
 #UPLOADSCRIPT=${UPLOADSCRIPT:-/data/uploadscript.sh}
 
+if [ -z "$UPLOADSCRIPT" ]; then
+  exit 0
+fi
 if [ ! -f "$UPLOADSCRIPT" ]; then
   >&2 echo "ERROR: UPLOADSCRIPT program/script is not defined or does not exist"
   exit 1
