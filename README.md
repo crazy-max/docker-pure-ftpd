@@ -48,7 +48,7 @@ ___
 * [PureDB](#puredb-authentication-method), [MySQL](#mysql-authentication-method), [PostgreSQL](examples/postgresql) and LDAP support
 * Latest [Pure-FTPd](https://github.com/jedisct1/pure-ftpd) release compiled from source
 * Support of `argon2` and `scrypt` hashing method through [Libsodium](https://libsodium.org/)
-* Logs processed to `stdout` through syslog-ng
+* Logs processed to `stdout` through [socklog-overlay](https://github.com/just-containers/socklog-overlay/)
 * Support of `pure-uploadscript`
 * `PASSIVE_IP` for PASV support automatically resolved
 
@@ -235,7 +235,7 @@ docker run --rm -it -v $(pwd)/data:/data crazymax/pure-ftpd \
 
 ### Logs
 
-Logs are displayed through `stdout` using syslog-ng. You can increase verbosity with `-d -d` flags.
+Logs are displayed through `stdout` using `socklog-overlay`. You can increase verbosity with `-d -d` flags.
 
 ```
 $ docker-compose logs -f pureftpd
