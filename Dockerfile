@@ -101,7 +101,8 @@ RUN apk --update --no-cache add \
 COPY --from=builder /pure-ftpd /
 COPY rootfs /
 
-ENV PURE_PASSWDFILE="/data/pureftpd.passwd" \
+ENV S6_BEHAVIOUR_IF_STAGE2_FAILS="2" \
+  PURE_PASSWDFILE="/data/pureftpd.passwd" \
   PURE_DBFILE="/data/pureftpd.pdb" \
   TZ="UTC"
 
