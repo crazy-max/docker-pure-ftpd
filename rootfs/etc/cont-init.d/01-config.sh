@@ -137,6 +137,11 @@ else
   echo "Use PureDB authentication method"
 fi
 
+# Set uploadscript if defined
+if [ -f "$UPLOADSCRIPT" ]; then
+  FLAGS="$FLAGS --uploadscript"
+fi
+
 # Check TLS cert
 if [ -f "$PFTPD_PEM" ]; then
   chmod 600 "$PFTPD_PEM"

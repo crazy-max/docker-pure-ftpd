@@ -44,12 +44,13 @@ ___
 ## Features
 
 * Multi-platform image
+* [s6-overlay](https://github.com/just-containers/s6-overlay/) as process supervisor
 * [PureDB](#puredb-authentication-method), [MySQL](#mysql-authentication-method), [PostgreSQL](examples/postgresql) and LDAP support
 * Latest [Pure-FTPd](https://github.com/jedisct1/pure-ftpd) release compiled from source
 * Support of `argon2` and `scrypt` hashing method through [Libsodium](https://libsodium.org/)
 * Logs processed to `stdout` through syslog-ng
+* Support of `pure-uploadscript`
 * `PASSIVE_IP` for PASV support automatically resolved
-* [s6-overlay](https://github.com/just-containers/s6-overlay/) as process supervisor
 
 ## Docker
 
@@ -78,6 +79,9 @@ Image: crazymax/pure-ftpd:latest
 * `PASSIVE_IP`: IP/Host for PASV support (default auto resolved with `dig +short myip.opendns.com @resolver1.opendns.com`)
 * `PASSIVE_PORT_RANGE`: Port range for passive connections (default `30000:30009`)
 * `DB_TIMEOUT`: Time in seconds after which we stop trying to reach the database server. Only used for `mysql` and `pgsql` auth method (default `45`)
+* `UPLOADSCRIPT`: What program/script to run after an upload. It has to be _an absolute filename_. (for example `/data/uploadscript.sh`)
+
+> :warning: Do not set `--uploadscript` flag. It will be added if `UPLOADSCRIPT` is defined.
 
 ### Volumes
 
