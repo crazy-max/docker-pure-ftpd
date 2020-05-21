@@ -34,6 +34,7 @@ RUN curl -sSL "https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${
     --prefix=/pure-ftpd \
     --without-humor \
     --without-inetd \
+    --without-pam \
     --with-altlog \
     --with-cookie \
     --with-ftpwho \
@@ -46,7 +47,6 @@ RUN curl -sSL "https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${
     --with-throttling \
     --with-tls \
     --with-uploadscript \
-    --with-certfile=/data/pureftpd.pem \
     --with-certfile=/data/pureftpd.pem \
   && make install-strip
 
