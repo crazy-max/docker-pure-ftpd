@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.49-RC13 / 1.0.47-RC10 (2020/05/22)
+
+* Fix parse error (#6)
+
 ## 1.0.49-RC12 / 1.0.47-RC9 (2020/05/22)
 
 * Bring back finish script
