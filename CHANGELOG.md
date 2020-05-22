@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.49-RC12 / 1.0.47-RC9 (2020/05/22)
+
+* Bring back finish script
+
 ## 1.0.49-RC11 / 1.0.47-RC8 (2020/05/22)
 
 * Set `S6_BEHAVIOUR_IF_STAGE2_FAILS` behavior (#6)
