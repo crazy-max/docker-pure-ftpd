@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.49-RC14 / 1.0.47-RC11 (2020/05/26)
+
+* Fix Libsodium support (#9)
+
 ## 1.0.49-RC13 / 1.0.47-RC10 (2020/05/22)
 
 * Fix parse error (#6)

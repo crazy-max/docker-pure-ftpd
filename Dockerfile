@@ -15,7 +15,7 @@ RUN apk --update --no-cache add \
     binutils \
     build-base \
     curl \
-    libsodium \
+    libsodium-dev \
     mariadb-connector-c-dev \
     openldap-dev \
     postgresql-dev \
