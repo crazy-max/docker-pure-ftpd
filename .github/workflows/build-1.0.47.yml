@@ -2,14 +2,18 @@ name: build-1.0.47
 
 on:
   push:
-    branches: 'master'
-    tags: '1.0.47-*'
-    paths:
-      - '.github/workflows/build.yml'
-      - 'patchs/**'
-      - 'rootfs/**'
-      - 'Dockerfile-1.0.47'
-      - 'entrypoint.sh'
+    branches:
+      - '**'
+      - '!dependabot/**'
+    tags:
+      - '1.0.47-*'
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    branches:
+      - '**'
+    paths-ignore:
+      - '**.md'
 
 jobs:
   build:
@@ -19,33 +23,39 @@ jobs:
         name: Prepare
         id: prepare
         run: |
+          DOCKER_USERNAME=crazymax
+          DOCKER_IMAGE=crazymax/pure-ftpd
+          DOCKER_PLATFORMS=linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/386,linux/ppc64le
+          VERSION=edge
+
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             TAG=${GITHUB_REF#refs/tags/}
-            echo ::set-output name=tag_name::${TAG}
-            echo ::set-output name=version::${TAG%-*}
-          else
-            echo ::set-output name=version::snapshot
+            VERSION=${TAG%-*}
           fi
-          echo ::set-output name=build_date::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-          echo ::set-output name=docker_platforms::linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/386,linux/ppc64le
-          echo ::set-output name=docker_username::crazymax
-          echo ::set-output name=docker_image::crazymax/pure-ftpd
+
+          TAGS="--tag ${DOCKER_IMAGE}:${VERSION}"
+          if [ "$VERSION" != "edge" ]; then
+            TAGS="$TAGS --tag ${DOCKER_IMAGE}:latest"
+          fi
+
+          echo ::set-output name=docker_username::${DOCKER_USERNAME}
+          echo ::set-output name=docker_image::${DOCKER_IMAGE}
+          echo ::set-output name=version::${VERSION}
+          echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} \
+            --build-arg VERSION=${VERSION} \
+            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+            --build-arg VCS_REF=${GITHUB_SHA::8} \
+            ${TAGS} --file Dockerfile-1.0.47 .
       -
         name: Set up Docker Buildx
-        uses: crazy-max/ghaction-docker-buildx@v1
+        uses: crazy-max/ghaction-docker-buildx@v3.1.0
       -
         name: Checkout
         uses: actions/checkout@v2
       -
-        name: Docker Buildx (no push)
+        name: Docker Buildx (build)
         run: |
-          docker buildx build --platform ${{ steps.prepare.outputs.docker_platforms }} \
-            --output "type=image,push=false" \
-            --build-arg "BUILD_DATE=${{ steps.prepare.outputs.build_date }}" \
-            --build-arg "VCS_REF=${GITHUB_SHA::8}" \
-            --build-arg "VERSION=${{ steps.prepare.outputs.version }}" \
-            --tag "${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}" \
-            --file Dockerfile-1.0.47 .
+          docker buildx build --output "type=image,push=false" ${{ steps.prepare.outputs.buildx_args }}
       -
         name: Docker Login
         if: success() && startsWith(github.ref, 'refs/tags/')
@@ -57,16 +67,10 @@ jobs:
         name: Docker Buildx (push)
         if: success() && startsWith(github.ref, 'refs/tags/')
         run: |
-          docker buildx build --platform ${{ steps.prepare.outputs.docker_platforms }} \
-            --output "type=image,push=true" \
-            --build-arg "BUILD_DATE=${{ steps.prepare.outputs.build_date }}" \
-            --build-arg "VCS_REF=${GITHUB_SHA::8}" \
-            --build-arg "VERSION=${{ steps.prepare.outputs.version }}" \
-            --tag "${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}" \
-            --file Dockerfile-1.0.47 .
+          docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}
       -
         name: Docker Check Manifest
-        if: always() && startsWith(github.ref, 'refs/tags/')
+        if: success() && startsWith(github.ref, 'refs/tags/')
         run: |
           docker run --rm mplatform/mquery ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
       -

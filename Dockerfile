@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:experimental
 FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:3.11 as builder
 
 ARG TARGETPLATFORM
@@ -51,7 +50,6 @@ RUN curl -sSL "https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${
     --with-certfile=/data/pureftpd.pem \
   && make install-strip
 
-# syntax=docker/dockerfile:experimental
 FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:3.11
 
 ARG BUILD_DATE
