@@ -27,7 +27,7 @@ COPY patchs /tmp/
 ENV PUREFTPD_VERSION="1.0.49"
 
 WORKDIR /tmp/pure-ftpd
-RUN curl -sSL "https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${PUREFTPD_VERSION}.tar.gz" | tar xz --strip 1 \
+RUN curl -sSL "https://github.com/jedisct1/pure-ftpd/releases/download/${PUREFTPD_VERSION}/pure-ftpd-${PUREFTPD_VERSION}.tar.gz" | tar xz --strip 1 \
   && patch -p1 < ../minimal.patch \
   && ./configure \
     --prefix=/pure-ftpd \
