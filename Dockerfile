@@ -1,4 +1,4 @@
-FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:3.11 as builder
+FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:3.12 as builder
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
@@ -50,7 +50,7 @@ RUN curl -sSL "https://github.com/jedisct1/pure-ftpd/releases/download/${PUREFTP
     --with-certfile=/data/pureftpd.pem \
   && make install-strip
 
-FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:3.11
+FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:3.12
 
 ARG BUILD_DATE
 ARG VCS_REF
