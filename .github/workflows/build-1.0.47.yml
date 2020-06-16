@@ -3,15 +3,14 @@ name: build-1.0.47
 on:
   push:
     branches:
-      - '**'
-      - '!dependabot/**'
+      - 'master'
     tags:
       - '1.0.47-*'
     paths-ignore:
       - '**.md'
   pull_request:
     branches:
-      - '**'
+      - 'master'
     paths-ignore:
       - '**.md'
 

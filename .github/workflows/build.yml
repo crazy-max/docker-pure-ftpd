@@ -3,8 +3,7 @@ name: build
 on:
   push:
     branches:
-      - '**'
-      - '!dependabot/**'
+      - 'master'
     tags:
       - '*'
       - '!1.0.47-*'
@@ -12,7 +11,7 @@ on:
       - '**.md'
   pull_request:
     branches:
-      - '**'
+      - 'master'
     paths-ignore:
       - '**.md'
 
