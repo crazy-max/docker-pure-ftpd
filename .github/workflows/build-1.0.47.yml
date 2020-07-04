@@ -33,10 +33,7 @@ jobs:
           fi
 
           TAGS="--tag ${DOCKER_IMAGE}:${VERSION}"
-          if [ "$VERSION" != "edge" ]; then
-            TAGS="$TAGS --tag ${DOCKER_IMAGE}:latest"
-          fi
-
+          
           echo ::set-output name=docker_username::${DOCKER_USERNAME}
           echo ::set-output name=docker_image::${DOCKER_IMAGE}
           echo ::set-output name=version::${VERSION}
