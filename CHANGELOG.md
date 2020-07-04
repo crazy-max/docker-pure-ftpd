@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.49-RC15 / 1.0.47-RC12 (2020/07/04)
+
+* Fix missing `TARGET_PLATFORM` (#13)
+
 ## 1.0.49-RC14 / 1.0.47-RC11 (2020/05/26)
 
 * Fix Libsodium support (#9)
