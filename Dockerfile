@@ -52,6 +52,9 @@ RUN curl -sSL "https://github.com/jedisct1/pure-ftpd/releases/download/${PUREFTP
 
 FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:3.12
 
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+
 ARG BUILD_DATE
 ARG VCS_REF
 ARG VERSION
@@ -104,7 +107,8 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS="2" \
   PURE_DBFILE="/data/pureftpd.pdb" \
   TZ="UTC"
 
-RUN mkdir -p /data
+RUN mkdir -p /data \
+  && pure-ftpwho --help
 
 EXPOSE 2100 30000-30009
 WORKDIR /data
