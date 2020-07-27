@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.49-RC16 / 1.0.47-RC13 (2020/07/27)
+
+* Fix `pure-uploadscript` daemon (#18)
+
 ## 1.0.49-RC15 / 1.0.47-RC12 (2020/07/04)
 
 * Fix missing `TARGET_PLATFORM` (#13)

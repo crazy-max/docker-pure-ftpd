@@ -14,6 +14,6 @@ mkdir -p /etc/services.d/pure-uploadscript
 cat > /etc/services.d/pure-uploadscript/run <<EOL
 #!/usr/bin/execlineb -P
 with-contenv
-pure-uploadscript --daemon --run ${UPLOADSCRIPT}
+pure-uploadscript -p /var/run/pure-uploadscript.pid -r ${UPLOADSCRIPT}
 EOL
 chmod +x /etc/services.d/pure-uploadscript/run
