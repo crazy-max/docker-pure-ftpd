@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.49-RC17 / 1.0.47-RC14 (2020/08/10)
+
+* Now based on [Alpine Linux 3.12 with s6 overlay](https://github.com/crazy-max/docker-alpine-s6/)
+
 ## 1.0.49-RC16 / 1.0.47-RC13 (2020/07/27)
 
 * Fix `pure-uploadscript` daemon (#18)

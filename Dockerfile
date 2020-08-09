@@ -1,4 +1,4 @@
-FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:3.12 as builder
+FROM --platform=${TARGETPLATFORM:-linux/amd64} crazymax/alpine-s6:3.12 as builder
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
@@ -50,7 +50,7 @@ RUN curl -sSL "https://github.com/jedisct1/pure-ftpd/releases/download/${PUREFTP
     --with-certfile=/data/pureftpd.pem \
   && make install-strip
 
-FROM --platform=${TARGETPLATFORM:-linux/amd64} alpine:3.12
+FROM --platform=${TARGETPLATFORM:-linux/amd64} crazymax/alpine-s6:3.12
 
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
@@ -70,6 +70,14 @@ LABEL maintainer="CrazyMax" \
   org.opencontainers.image.description="Pure-FTPd with MySQL, PostgreSQL and LDAP support" \
   org.opencontainers.image.licenses="MIT"
 
+ENV S6_BEHAVIOUR_IF_STAGE2_FAILS="2" \
+  PURE_PASSWDFILE="/data/pureftpd.passwd" \
+  PURE_DBFILE="/data/pureftpd.pdb" \
+  TZ="UTC"
+
+COPY --from=builder /pure-ftpd /
+COPY rootfs /
+
 RUN apk --update --no-cache add \
     bind-tools \
     libldap \
@@ -82,33 +90,9 @@ RUN apk --update --no-cache add \
     postgresql-client \
     tzdata \
     zlib \
-  && S6_ARCH=$(case ${TARGETPLATFORM:-linux/amd64} in \
-    "linux/amd64")   echo "amd64"   ;; \
-    "linux/arm/v6")  echo "arm"     ;; \
-    "linux/arm/v7")  echo "armhf"   ;; \
-    "linux/arm64")   echo "aarch64" ;; \
-    "linux/386")     echo "x86"     ;; \
-    "linux/ppc64le") echo "ppc64le" ;; \
-    *)               echo ""        ;; esac) \
-  && echo "S6_ARCH=$S6_ARCH" \
-  && wget -q "https://github.com/just-containers/s6-overlay/releases/latest/download/s6-overlay-${S6_ARCH}.tar.gz" -qO "/tmp/s6-overlay-${S6_ARCH}.tar.gz" \
-  && tar xzf /tmp/s6-overlay-${S6_ARCH}.tar.gz -C / \
-  && s6-echo "s6-overlay installed" \
-  && wget -q "https://github.com/just-containers/socklog-overlay/releases/latest/download/socklog-overlay-${S6_ARCH}.tar.gz" -qO "/tmp/socklog-overlay-${S6_ARCH}.tar.gz" \
-  && tar xzf /tmp/socklog-overlay-${S6_ARCH}.tar.gz -C / \
-  && rm -f /etc/socklog.rules/* \
+  && mkdir -p /data \
+  && pure-ftpwho --help \
   && rm -rf /tmp/* /var/cache/apk/*
-
-COPY --from=builder /pure-ftpd /
-COPY rootfs /
-
-ENV S6_BEHAVIOUR_IF_STAGE2_FAILS="2" \
-  PURE_PASSWDFILE="/data/pureftpd.passwd" \
-  PURE_DBFILE="/data/pureftpd.pdb" \
-  TZ="UTC"
-
-RUN mkdir -p /data \
-  && pure-ftpwho --help
 
 EXPOSE 2100 30000-30009
 WORKDIR /data
