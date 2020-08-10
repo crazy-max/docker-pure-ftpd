@@ -75,9 +75,6 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS="2" \
   PURE_DBFILE="/data/pureftpd.pdb" \
   TZ="UTC"
 
-COPY --from=builder /pure-ftpd /
-COPY rootfs /
-
 RUN apk --update --no-cache add \
     bind-tools \
     libldap \
@@ -90,9 +87,14 @@ RUN apk --update --no-cache add \
     postgresql-client \
     tzdata \
     zlib \
-  && mkdir -p /data \
-  && pure-ftpwho --help \
+  && rm -f /etc/socklog.rules/* \
   && rm -rf /tmp/* /var/cache/apk/*
+
+COPY --from=builder /pure-ftpd /
+COPY rootfs /
+
+RUN mkdir -p /data \
+  && pure-ftpwho --help
 
 EXPOSE 2100 30000-30009
 WORKDIR /data
