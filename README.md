@@ -20,7 +20,7 @@ ___
 
 * [Features](#features)
 * [Docker](#docker)
-  * [Multi-platform image](#multi-platform-image)
+  * [Image](#image)
   * [Environment variables](#environment-variables)
   * [Volumes](#volumes)
   * [Ports](#ports)
@@ -53,7 +53,12 @@ ___
 
 ## Docker
 
-### Multi-platform image
+### Image
+
+| Registry                                                                                         | Image                           |
+|--------------------------------------------------------------------------------------------------|---------------------------------|
+| [Docker Hub](https://hub.docker.com/r/crazymax/pure-ftpd/)                                            | `crazymax/pure-ftpd`                 |
+| [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/pure-ftpd)  | `ghcr.io/crazy-max/pure-ftpd`        |
 
 Following platforms for this image are available:
 
@@ -96,7 +101,8 @@ Image: crazymax/pure-ftpd:latest
 
 ### Docker Compose
 
-Docker compose is the recommended way to run this image. You can use the following [docker compose template](examples/puredb/docker-compose.yml), then run the container:
+Docker compose is the recommended way to run this image. You can use the following
+[docker compose template](examples/puredb/docker-compose.yml), then run the container:
 
 ```bash
 docker-compose up -d
@@ -129,7 +135,9 @@ docker-compose up -d
 
 ### Flags
 
-This image uses flags instead of the configuration file to set Pure-FTPd. Some [flags are forced](https://github.com/crazy-max/docker-pure-ftpd/blob/55c6f6f0857536faf2d93f8d8227c6fec84200ec/entrypoint.sh#L32-L38) but you can pass additional flags in `/data/pureftpd.flags` file:
+This image uses flags instead of the configuration file to set Pure-FTPd. Some
+[flags are forced](https://github.com/crazy-max/docker-pure-ftpd/blob/55c6f6f0857536faf2d93f8d8227c6fec84200ec/entrypoint.sh#L32-L38)
+but you can pass additional flags in `/data/pureftpd.flags` file:
 
 ```
 -d
@@ -141,11 +149,15 @@ This image uses flags instead of the configuration file to set Pure-FTPd. Some [
 
 ### Secure mode
 
-`SECURE_MODE` enables [specially crafted flags](https://github.com/crazy-max/docker-pure-ftpd/blob/55c6f6f0857536faf2d93f8d8227c6fec84200ec/entrypoint.sh#L44-L56) to enforced security of Pure-FTPd.
+`SECURE_MODE` enables
+[specially crafted flags](https://github.com/crazy-max/docker-pure-ftpd/blob/55c6f6f0857536faf2d93f8d8227c6fec84200ec/entrypoint.sh#L44-L56)
+to enforced security of Pure-FTPd.
 
 ### PureDB authentication method
 
-Using [PureDB](examples/puredb) authentication method, the container will create a blank password file in `/data/pureftpd.passwd` and a initialize a PureDB database in `/data/pureftpd.pdb`. If a password file is already available, it will be read on startup and the PureDB database will be updated.
+Using [PureDB](examples/puredb) authentication method, the container will create a blank password file in
+`/data/pureftpd.passwd` and a initialize a PureDB database in `/data/pureftpd.pdb`. If a password file is
+already available, it will be read on startup and the PureDB database will be updated.
 
 At first execution of the container no user will be available and you will have to create one:
 
@@ -158,12 +170,14 @@ foo                 /home/foo/./
 $ cat ./data/pureftpd.passwd
 foo:$2a$10$Oqn7I2P7YaGxQrtuydcDKuxmCJqPR7a79EeDy2gChyOGEnYA4UIPK:1003:1005::/home/foo/./::::::::::::
 ```
-> User `foo` will be created with uid `1003`, gid `1005` with his home directory located at `/home/foo`. The password will be asked after.
-> More info about local users database: https://github.com/jedisct1/pure-ftpd/blob/master/README.Virtual-Users
+> User `foo` will be created with uid `1003`, gid `1005` with his home directory located at `/home/foo`.
+> The password will be asked after. More info about local users database:
+> https://github.com/jedisct1/pure-ftpd/blob/master/README.Virtual-Users
 
 ### Persist FTP user home
 
-Looking at the previous example, don't forget to persist the home directory through a [named or bind mounted volume](https://docs.docker.com/storage/volumes/) like:
+Looking at the previous example, don't forget to persist the home directory through a
+[named or bind mounted volume](https://docs.docker.com/storage/volumes/) like:
 
 ```bash
 version: "3.2"
@@ -186,9 +200,12 @@ services:
 
 ### MySQL authentication method
 
-A [quick example](examples/mariadb) to use MySQL authentication method is also available using a MariaDB container. Before using starting the container, a [MySQL configuration file](examples/mariadb/data/pureftpd-mysql.conf) must be available in `/data/pureftpd-mysql.conf`.
+A [quick example](examples/mariadb) to use MySQL authentication method is also available using a MariaDB container.
+Before using starting the container, a [MySQL configuration file](examples/mariadb/data/pureftpd-mysql.conf) must
+be available in `/data/pureftpd-mysql.conf`.
 
-In the [docker compose example](examples/mariadb) available, the database and the [users table](examples/mariadb/users.sql) will be created at first launch.
+In the [docker compose example](examples/mariadb) available, the database and the
+[users table](examples/mariadb/users.sql) will be created at first launch.
 
 To create your first user you can use this one line command:
 
@@ -201,14 +218,19 @@ $ docker-compose exec db mysql -u pureftpd -p'asupersecretpassword' -e "SELECT *
 | foo  | Oo4cJdd1HNVA6 | 1003 | 1005 | /home/foo |
 +------+---------------+------+------+-----------+
 ```
-> User `foo` will be created with uid `1003`, gid `1005` with his home directory located at `/home/foo`. Here we assume `crypt` is the `MySQLCrypt` method and the password `test` is hashed using crypt.
+> User `foo` will be created with uid `1003`, gid `1005` with his home directory located at `/home/foo`. Here we assume
+> `crypt` is the `MySQLCrypt` method and the password `test` is hashed using crypt.
 > More info about MySQL authentication method: https://github.com/jedisct1/pure-ftpd/blob/master/README.MySQL
 
 ### PostgreSQL authentication method
 
-Like MySQL, there is also a [quick example](examples/postgresql) to use PostgreSQL authentication method using a PostgreSQL container. And also before starting the container, a [PostgreSQL configuration file](examples/postgresql/data/pureftpd-pgsql.conf) must be available in `/data/pureftpd-pgsql.conf`.
+Like MySQL, there is also a [quick example](examples/postgresql) to use PostgreSQL authentication method using a
+PostgreSQL container. And also before starting the container, a
+[PostgreSQL configuration file](examples/postgresql/data/pureftpd-pgsql.conf) must be available
+in `/data/pureftpd-pgsql.conf`.
 
-In the [docker compose example](examples/postgresql) available, the database and the [users table](examples/postgresql/users.sql) will be also created at first launch.
+In the [docker compose example](examples/postgresql) available, the database and the
+[users table](examples/postgresql/users.sql) will be also created at first launch.
 
 How add new user with encrypted password?
 ```sql
@@ -220,7 +242,9 @@ INSERT INTO "users" ("User", "Password", "Dir") VALUES ('foo', crypt('mypassword
 
 ### TLS connection
 
-[TLS connections](https://github.com/jedisct1/pure-ftpd/blob/master/README.TLS) require certificates, as well as their key. Both can be bundled into a single file. If you have both a `.pem` file and a `.key` file, just concatenate the content of the `.key` file to the `.pem` file.
+[TLS connections](https://github.com/jedisct1/pure-ftpd/blob/master/README.TLS) require certificates, as well as their
+key. Both can be bundled into a single file. If you have both a `.pem` file and a `.key` file, just concatenate the
+content of the `.key` file to the `.pem` file.
 
 The certificate needs to be located in `/data/pureftpd.pem` and `--tls <opt>` added to enable TLS connection.
 
@@ -270,7 +294,10 @@ pureftpd    | ftp.notice: May 21 18:10:17 pure-ftpd: (foo@192.168.0.1) [NOTICE] 
 
 ## How can I help?
 
-All kinds of contributions are welcome :raised_hands:! The most basic way to show your support is to star :star2: the project, or to raise issues :speech_balloon: You can also support this project by [**becoming a sponsor on GitHub**](https://github.com/sponsors/crazy-max) :clap: or by making a [Paypal donation](https://www.paypal.me/crazyws) to ensure this journey continues indefinitely! :rocket:
+All kinds of contributions are welcome :raised_hands:! The most basic way to show your support is to star :star2:
+the project, or to raise issues :speech_balloon: You can also support this project by
+[**becoming a sponsor on GitHub**](https://github.com/sponsors/crazy-max) :clap: or by making a
+[Paypal donation](https://www.paypal.me/crazyws) to ensure this journey continues indefinitely! :rocket:
 
 Thanks again for your support, it is much appreciated! :pray:
 
