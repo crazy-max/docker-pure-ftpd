@@ -1,9 +1,5 @@
 FROM --platform=${TARGETPLATFORM:-linux/amd64} crazymax/alpine-s6:3.12 as builder
 
-ARG TARGETPLATFORM
-ARG BUILDPLATFORM
-RUN printf "I am running on ${BUILDPLATFORM:-linux/amd64}, building for ${TARGETPLATFORM:-linux/amd64}\n$(uname -a)\n"
-
 RUN apk --update --no-cache add \
     autoconf \
     automake \
@@ -46,11 +42,12 @@ RUN curl -sSL "https://github.com/jedisct1/pure-ftpd/releases/download/${PUREFTP
     --with-certfile=/data/pureftpd.pem \
   && make install-strip
 
+ARG TARGETPLATFORM
 FROM --platform=${TARGETPLATFORM:-linux/amd64} crazymax/alpine-s6:3.12
-
 LABEL maintainer="CrazyMax"
 
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS="2" \
+  SOCKLOG_TIMESTAMP_FORMAT="" \
   PURE_PASSWDFILE="/data/pureftpd.passwd" \
   PURE_DBFILE="/data/pureftpd.pdb" \
   TZ="UTC"
