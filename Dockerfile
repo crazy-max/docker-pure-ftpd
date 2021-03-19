@@ -1,27 +1,30 @@
-FROM --platform=${TARGETPLATFORM:-linux/amd64} crazymax/alpine-s6:3.12 as builder
+ARG PUREFTPD_VERSION=1.0.49
 
+FROM --platform=${BUILDPLATFORM:-linux/amd64} crazymax/alpine-s6:3.12-2.1.0.2 AS download
+RUN apk --update --no-cache add curl patch tar
+
+ARG PUREFTPD_VERSION
+WORKDIR /dist/pureftpd
+COPY patchs /dist
+RUN curl -sSL "https://github.com/jedisct1/pure-ftpd/releases/download/${PUREFTPD_VERSION}/pure-ftpd-${PUREFTPD_VERSION}.tar.gz" | tar xz --strip 1 \
+  && patch -p1 < ../minimal.patch
+
+FROM crazymax/alpine-s6:3.12-2.1.0.2 AS builder
 RUN apk --update --no-cache add \
     autoconf \
     automake \
     binutils \
     build-base \
-    curl \
     libsodium-dev \
     mariadb-connector-c-dev \
     openldap-dev \
     postgresql-dev \
     openssl-dev \
-    tar \
   && rm -rf /tmp/*
 
-COPY patchs /tmp/
-
-ENV PUREFTPD_VERSION="1.0.49"
-
-WORKDIR /tmp/pure-ftpd
-RUN curl -sSL "https://github.com/jedisct1/pure-ftpd/releases/download/${PUREFTPD_VERSION}/pure-ftpd-${PUREFTPD_VERSION}.tar.gz" | tar xz --strip 1 \
-  && patch -p1 < ../minimal.patch \
-  && ./configure \
+COPY --from=download /dist/pureftpd /tmp/pureftpd
+WORKDIR /tmp/pureftpd
+RUN ./configure \
     --prefix=/pure-ftpd \
     --without-humor \
     --without-inetd \
@@ -42,8 +45,7 @@ RUN curl -sSL "https://github.com/jedisct1/pure-ftpd/releases/download/${PUREFTP
     --with-certfile=/data/pureftpd.pem \
   && make install-strip
 
-ARG TARGETPLATFORM
-FROM --platform=${TARGETPLATFORM:-linux/amd64} crazymax/alpine-s6:3.12
+FROM crazymax/alpine-s6:3.12-2.1.0.2
 LABEL maintainer="CrazyMax"
 
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS="2" \
