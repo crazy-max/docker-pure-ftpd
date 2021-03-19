@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.49-r18 / 1.0.47-r15 (2021/03/19)
+
+* Upstream Alpine update
+* Disable socklog timestamp
+* Publish to GHCR
+* Switch to buildx bake (#33)
+* Switch to Docker actions
+* Remove support for `linux/s390x`
+
 ## 1.0.49-RC17 / 1.0.47-RC14 (2020/08/10)
 
 * Now based on [Alpine Linux 3.12 with s6 overlay](https://github.com/crazy-max/docker-alpine-s6/)
