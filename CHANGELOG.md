@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.49-r19 / 1.0.47-r16 (2021/06/04)
+
+* Alpine Linux 3.13
+* alpine-s6 2.2.0.3
+
 ## 1.0.49-r18 / 1.0.47-r15 (2021/03/19)
 
 * Upstream Alpine update
