@@ -66,7 +66,7 @@ RUN apk --update --no-cache add \
     tzdata \
     zlib \
   && rm -f /etc/socklog.rules/* \
-  && rm -rf /tmp/* /var/cache/apk/*
+  && rm -rf /tmp/*
 
 COPY --from=builder /pure-ftpd /
 COPY rootfs /
