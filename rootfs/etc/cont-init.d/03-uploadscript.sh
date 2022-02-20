@@ -1,4 +1,5 @@
 #!/usr/bin/with-contenv sh
+# shellcheck shell=sh
 
 #UPLOADSCRIPT=${UPLOADSCRIPT:-/data/uploadscript.sh}
 
