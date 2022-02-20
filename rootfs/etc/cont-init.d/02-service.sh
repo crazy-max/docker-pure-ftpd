@@ -1,4 +1,5 @@
 #!/usr/bin/with-contenv sh
+# shellcheck shell=sh
 
 mkdir -p /etc/services.d/pure-ftpd
 

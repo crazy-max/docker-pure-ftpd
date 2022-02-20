@@ -1,4 +1,4 @@
-ARG PUREFTPD_VERSION=1.0.49
+ARG PUREFTPD_VERSION=1.0.50
 
 FROM --platform=${BUILDPLATFORM:-linux/amd64} crazymax/alpine-s6:3.15-2.2.0.3 AS download
 RUN apk --update --no-cache add curl patch tar
@@ -26,6 +26,7 @@ COPY --from=download /dist/pureftpd /tmp/pureftpd
 WORKDIR /tmp/pureftpd
 RUN ./configure \
     --prefix=/pure-ftpd \
+    --without-ascii \
     --without-humor \
     --without-inetd \
     --without-pam \

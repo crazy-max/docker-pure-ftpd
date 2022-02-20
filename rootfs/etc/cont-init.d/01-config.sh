@@ -1,4 +1,5 @@
 #!/usr/bin/with-contenv sh
+# shellcheck shell=sh
 
 TZ=${TZ:-UTC}
 AUTH_METHOD=${AUTH_METHOD:-puredb}
