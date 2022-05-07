@@ -1,5 +1,9 @@
 name: build-1.0.47
 
+concurrency:
+  group: build-1.0.47-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches:
