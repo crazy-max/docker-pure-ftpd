@@ -66,6 +66,7 @@ RUN apk --update --no-cache add \
     postgresql-client \
     tzdata \
     zlib \
+    curl \
   && rm -f /etc/socklog.rules/* \
   && rm -rf /tmp/*
 
