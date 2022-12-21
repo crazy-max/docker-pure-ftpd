@@ -11,10 +11,13 @@
 
 ## About
 
-[Pure-FTPd](https://www.pureftpd.org/) Docker image based on Alpine Linux with MySQL, PostgreSQL and LDAP support.<br />
-If you are interested, [check out](https://hub.docker.com/r/crazymax/) my other Docker images!
+[Pure-FTPd](https://www.pureftpd.org/) Docker image based with MySQL,
+PostgreSQL and LDAP support.
 
-💡 Want to be notified of new releases? Check out 🔔 [Diun (Docker Image Update Notifier)](https://github.com/crazy-max/diun) project!
+> **Note**
+> 
+> Want to be notified of new releases? Check out 🔔 [Diun (Docker Image Update Notifier)](https://github.com/crazy-max/diun)
+> project!
 
 ___
 
