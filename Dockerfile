@@ -1,6 +1,7 @@
 ARG PUREFTPD_VERSION=1.0.50
+ARG ALPINE_VERSION=3.17
 
-FROM --platform=${BUILDPLATFORM:-linux/amd64} crazymax/alpine-s6:3.15-2.2.0.3 AS download
+FROM --platform=${BUILDPLATFORM:-linux/amd64} crazymax/alpine-s6:${ALPINE_VERSION}-2.2.0.3 AS download
 RUN apk --update --no-cache add curl patch tar
 
 ARG PUREFTPD_VERSION
@@ -9,7 +10,7 @@ COPY patchs /dist
 RUN curl -sSL "https://github.com/jedisct1/pure-ftpd/releases/download/${PUREFTPD_VERSION}/pure-ftpd-${PUREFTPD_VERSION}.tar.gz" | tar xz --strip 1 \
   && patch -p1 < ../minimal.patch
 
-FROM crazymax/alpine-s6:3.15-2.2.0.3 AS builder
+FROM crazymax/alpine-s6:${ALPINE_VERSION}-2.2.0.3 AS builder
 RUN apk --update --no-cache add \
     autoconf \
     automake \
@@ -46,7 +47,7 @@ RUN ./configure \
     --with-certfile=/data/pureftpd.pem \
   && make install-strip
 
-FROM crazymax/alpine-s6:3.15-2.2.0.3
+FROM crazymax/alpine-s6:${ALPINE_VERSION}-2.2.0.3
 
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS="2" \
   SOCKLOG_TIMESTAMP_FORMAT="" \
@@ -56,6 +57,7 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS="2" \
 
 RUN apk --update --no-cache add \
     bind-tools \
+    curl \
     libldap \
     libpq \
     libsodium \
@@ -66,7 +68,6 @@ RUN apk --update --no-cache add \
     postgresql-client \
     tzdata \
     zlib \
-    curl \
   && rm -f /etc/socklog.rules/* \
   && rm -rf /tmp/*
 
