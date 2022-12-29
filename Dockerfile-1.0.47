@@ -7,7 +7,7 @@ RUN apk --update --no-cache add curl patch tar
 ARG PUREFTPD_VERSION
 WORKDIR /dist/pureftpd
 COPY patchs /dist
-RUN curl -sSL "https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${PUREFTPD_VERSION}.tar.gz" | tar xz --strip 1 \
+RUN curl -sSL "https://download.pureftpd.org/pub/pure-ftpd/releases/obsolete/pure-ftpd-${PUREFTPD_VERSION}.tar.gz" | tar xz --strip 1 \
   && patch -p1 < ../minimal.patch
 
 FROM crazymax/alpine-s6:${ALPINE_VERSION}-2.2.0.3 AS builder
