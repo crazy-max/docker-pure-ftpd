@@ -1,32 +1,42 @@
+# syntax=docker/dockerfile:1
+
 ARG PUREFTPD_VERSION=1.0.50
 ARG ALPINE_VERSION=3.17
+ARG XX_VERSION=1.2.1
 
-FROM --platform=${BUILDPLATFORM:-linux/amd64} crazymax/alpine-s6:${ALPINE_VERSION}-2.2.0.3 AS download
-RUN apk --update --no-cache add curl patch tar
-
+FROM --platform=${BUILDPLATFORM} crazymax/alpine-s6:${ALPINE_VERSION}-2.2.0.3 AS src
+COPY --from=xx / /
+RUN apk --update --no-cache add git patch
+WORKDIR /src/pure-ftpd
+RUN git init . && git remote add origin "https://github.com/jedisct1/pure-ftpd.git"
 ARG PUREFTPD_VERSION
-WORKDIR /dist/pureftpd
-COPY patchs /dist
-RUN curl -sSL "https://github.com/jedisct1/pure-ftpd/releases/download/${PUREFTPD_VERSION}/pure-ftpd-${PUREFTPD_VERSION}.tar.gz" | tar xz --strip 1 \
-  && patch -p1 < ../minimal.patch
+RUN git fetch origin "${PUREFTPD_VERSION}" && git checkout -q FETCH_HEAD
+COPY patchs /src
+RUN patch -p1 < ../minimal.patch
 
-FROM crazymax/alpine-s6:${ALPINE_VERSION}-2.2.0.3 AS builder
-RUN apk --update --no-cache add \
-    autoconf \
-    automake \
-    binutils \
-    build-base \
+FROM --platform=${BUILDPLATFORM} tonistiigi/xx:${XX_VERSION} AS xx
+FROM --platform=${BUILDPLATFORM} crazymax/alpine-s6:${ALPINE_VERSION}-2.2.0.3 AS builder
+COPY --from=xx / /
+RUN apk --update --no-cache add autoconf automake binutils clang14 file make pkgconf tar xz
+ENV XX_CC_PREFER_LINKER=ld
+ARG TARGETPLATFORM
+RUN xx-apk --no-cache --update add \
+    gcc \
+    linux-headers \
+    musl-dev \
     libsodium-dev \
     mariadb-connector-c-dev \
     openldap-dev \
     postgresql-dev \
-    openssl-dev \
-  && rm -rf /tmp/*
-
-COPY --from=download /dist/pureftpd /tmp/pureftpd
-WORKDIR /tmp/pureftpd
-RUN ./configure \
-    --prefix=/pure-ftpd \
+    openssl-dev
+WORKDIR /src
+COPY --from=src /src/pure-ftpd /src
+RUN <<EOT
+  set -ex
+  ./autogen.sh
+  ./configure \
+    --host=$(xx-clang --print-target-triple) \
+    --prefix=/out \
     --without-ascii \
     --without-humor \
     --without-inetd \
@@ -34,18 +44,22 @@ RUN ./configure \
     --with-altlog \
     --with-cookie \
     --with-ftpwho \
-    --with-ldap \
-    --with-mysql \
-    --with-pgsql \
+    --with-ldap=$(xx-info sysroot)usr \
+    --with-mysql=$(xx-info sysroot)usr \
+    --with-pgsql=$(xx-info sysroot)usr \
     --with-puredb \
     --with-quotas \
     --with-ratios \
     --with-throttling \
-    --with-tls \
+    --with-tls=$(xx-info sysroot)usr \
     --with-uploadscript \
     --with-brokenrealpath \
-    --with-certfile=/data/pureftpd.pem \
-  && make install-strip
+    --with-certfile=/data/pureftpd.pem
+  make install
+  xx-verify /out/sbin/pure-ftpd
+  xx-verify /out/sbin/pure-uploadscript
+  file /out/sbin/pure-ftpd
+EOT
 
 FROM crazymax/alpine-s6:${ALPINE_VERSION}-2.2.0.3
 
@@ -71,11 +85,8 @@ RUN apk --update --no-cache add \
   && rm -f /etc/socklog.rules/* \
   && rm -rf /tmp/*
 
-COPY --from=builder /pure-ftpd /
+COPY --from=builder /out /
 COPY rootfs /
-
-RUN mkdir -p /data \
-  && pure-ftpwho --help
 
 EXPOSE 2100 30000-30009
 WORKDIR /data
