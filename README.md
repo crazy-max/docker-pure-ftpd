@@ -115,11 +115,11 @@ Image: crazymax/pure-ftpd:latest
 ### Docker Compose
 
 Docker compose is the recommended way to run this image. You can use the following
-[docker compose template](examples/puredb/docker-compose.yml), then run the container:
+[compose template](examples/puredb/compose.yml), then run the container:
 
 ```bash
-docker-compose up -d
-docker-compose logs -f
+docker compose up -d
+docker compose logs -f
 ```
 
 ### Command line
@@ -140,8 +140,8 @@ $ docker run -d --name pure-ftpd \
 Recreate the container whenever I push an update:
 
 ```bash
-docker-compose pull
-docker-compose up -d
+docker compose pull
+docker compose up -d
 ```
 
 ## Notes
@@ -175,14 +175,15 @@ already available, it will be read on startup and the PureDB database will be up
 At first execution of the container no user will be available and you will have to create one:
 
 ```
-$ docker-compose exec pureftpd pure-pw useradd foo -u 1003 -g 1005 -d /home/foo -m
+$ docker compose exec pureftpd pure-pw useradd foo -u 1003 -g 1005 -d /home/foo -m
 Password:
 Enter it again:
-$ docker-compose exec pureftpd pure-pw list
+$ docker compose exec pureftpd pure-pw list
 foo                 /home/foo/./
 $ cat ./data/pureftpd.passwd
 foo:$2a$10$Oqn7I2P7YaGxQrtuydcDKuxmCJqPR7a79EeDy2gChyOGEnYA4UIPK:1003:1005::/home/foo/./::::::::::::
 ```
+
 > User `foo` will be created with uid `1003`, gid `1005` with his home directory located at `/home/foo`.
 > The password will be asked after. More info about local users database:
 > https://github.com/jedisct1/pure-ftpd/blob/master/README.Virtual-Users
@@ -223,14 +224,15 @@ In the [docker compose example](examples/mariadb) available, the database and th
 To create your first user you can use this one line command:
 
 ```
-$ docker-compose exec db mysql -u pureftpd -p'asupersecretpassword' -e "INSERT INTO users (User,Password,Uid,Gid,Dir) VALUES ('foo',ENCRYPT('test'),'1003','1005','/home/foo');" pureftpd
-$ docker-compose exec db mysql -u pureftpd -p'asupersecretpassword' -e "SELECT * FROM users;" pureftpd
+$ docker compose exec db mysql -u pureftpd -p'asupersecretpassword' -e "INSERT INTO users (User,Password,Uid,Gid,Dir) VALUES ('foo',ENCRYPT('test'),'1003','1005','/home/foo');" pureftpd
+$ docker compose exec db mysql -u pureftpd -p'asupersecretpassword' -e "SELECT * FROM users;" pureftpd
 +------+---------------+------+------+-----------+
 | User | Password      | Uid  | Gid  | Dir       |
 +------+---------------+------+------+-----------+
 | foo  | Oo4cJdd1HNVA6 | 1003 | 1005 | /home/foo |
 +------+---------------+------+------+-----------+
 ```
+
 > User `foo` will be created with uid `1003`, gid `1005` with his home directory located at `/home/foo`. Here we assume
 > `crypt` is the `MySQLCrypt` method and the password `test` is hashed using crypt.
 > More info about MySQL authentication method: https://github.com/jedisct1/pure-ftpd/blob/master/README.MySQL
@@ -275,7 +277,7 @@ docker run --rm -it --entrypoint '' -v $(pwd)/data:/data crazymax/pure-ftpd \
 Logs are displayed through `stdout` using `socklog-overlay`. You can increase verbosity with `-d -d` flags.
 
 ```
-$ docker-compose logs -f pureftpd
+$ docker compose logs -f pureftpd
 Attaching to pureftpd
 pureftpd    | [s6-init] making user provided files available at /var/run/s6/etc...exited 0.
 pureftpd    | [s6-init] ensuring user provided files have correct perms...exited 0.

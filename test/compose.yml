@@ -1,0 +1,16 @@
+services:
+  pureftpd:
+    image: ${PUREFTPD_IMAGE:-crazymax/pure-ftpd}
+    container_name: ${PUREFTPD_CONTAINER:-pure-ftpd}
+    ports:
+      - "2100:2100"
+      - "30000-30009:30000-30009"
+    volumes:
+      - "pureftpd:/data"
+    environment:
+      - "TZ=Europe/Paris"
+      - "AUTH_METHOD=puredb"
+    restart: always
+
+volumes:
+  pureftpd:

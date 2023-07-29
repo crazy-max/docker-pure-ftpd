@@ -1,17 +1,18 @@
-version: "3.5"
-
 services:
   db:
-    image: postgres:9.6
+    image: mariadb:10.4
     container_name: pureftpd_db
+    networks:
+      - pureftpd
     volumes:
-      - "./db:/var/lib/postgresql/data"
+      - "./db:/var/lib/mysql"
       - "./users.sql:/docker-entrypoint-initdb.d/users.sql"
     environment:
       - "TZ=Europe/Paris"
-      - "POSTGRES_DB=pureftpd"
-      - "POSTGRES_USER=postgres"
-      - "POSTGRES_PASSWORD=asupersecretpassword"
+      - "MYSQL_ALLOW_EMPTY_PASSWORD=yes"
+      - "MYSQL_DATABASE=pureftpd"
+      - "MYSQL_USER=pureftpd"
+      - "MYSQL_PASSWORD=asupersecretpassword"
     restart: always
 
   pureftpd:
@@ -28,7 +29,7 @@ services:
       - "./data:/data"
     environment:
       - "TZ=Europe/Paris"
-      - "AUTH_METHOD=pgsql"
+      - "AUTH_METHOD=mysql"
     restart: always
 
 networks:
