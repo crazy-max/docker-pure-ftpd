@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ARG PUREFTPD_VERSION=1.0.50
-ARG ALPINE_VERSION=3.17
+ARG ALPINE_VERSION=3.18
 ARG XX_VERSION=1.2.1
 
 FROM --platform=${BUILDPLATFORM} crazymax/alpine-s6:${ALPINE_VERSION}-2.2.0.3 AS src
