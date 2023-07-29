@@ -1,7 +1,7 @@
 name: build-1.0.47
 
 concurrency:
-  group: build-1.0.47-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 on:
@@ -13,8 +13,6 @@ on:
     paths-ignore:
       - '**.md'
   pull_request:
-    branches:
-      - 'master'
     paths-ignore:
       - '**.md'
 
