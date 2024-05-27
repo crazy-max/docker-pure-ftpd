@@ -9,7 +9,7 @@ services:
       - "./users.sql:/docker-entrypoint-initdb.d/users.sql"
     environment:
       - "TZ=Europe/Paris"
-      - "MYSQL_ALLOW_EMPTY_PASSWORD=yes"
+      - "MARIADB_RANDOM_ROOT_PASSWORD=yes"
       - "MYSQL_DATABASE=pureftpd"
       - "MYSQL_USER=pureftpd"
       - "MYSQL_PASSWORD=asupersecretpassword"
