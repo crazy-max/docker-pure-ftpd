@@ -1,6 +1,6 @@
 services:
   db:
-    image: mariadb:10.4
+    image: mariadb:10
     container_name: pureftpd_db
     networks:
       - pureftpd
