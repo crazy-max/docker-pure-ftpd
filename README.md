@@ -259,7 +259,7 @@ INSERT INTO "users" ("User", "Password", "Dir") VALUES ('foo', crypt('mypassword
 key. Both can be bundled into a single file. If you have both a `.pem` file and a `.key` file, just concatenate the
 content of the `.key` file to the `.pem` file.
 
-The certificate needs to be located in `/data/pureftpd.pem` and `--tls <opt>` added to enable TLS connection.
+The certificate needs to be located in `/data/pureftpd.pem` and `--tls <opt>` added to `pureftpd.flags` to enable TLS connection. `<opt>` is integer in range `0-3`, see below.
 
 To get started, you can create a self-signed certificate with the following command:
 
@@ -267,8 +267,18 @@ To get started, you can create a self-signed certificate with the following comm
 docker run --rm -it --entrypoint '' -v $(pwd)/data:/data crazymax/pure-ftpd \
   openssl dhparam -out /data/pureftpd-dhparams.pem 2048
 docker run --rm -it --entrypoint '' -v $(pwd)/data:/data crazymax/pure-ftpd \
-  openssl req -x509 -nodes -newkey rsa:2048 -sha256 -keyout /data/pureftpd.pem -out /data/pureftpd.pem
+  openssl req -x509 -nodes -newkey rsa:2048 -sha256 -keyout /data/pureftpd.pem -out /data/pureftpd.pem -subj "/C=Country/ST=State/L=Locality/O=Org/OU=Unit/CN=PureFtdp"
 ```
+
+or run the above two openssl commands outside docker in the local data dir mounted in `/data`.
+
+See the `--tls <opt>` flag options at [man pure-ftpd](https://linux.die.net/man/8/pure-ftpd).
+If `<opt>` is missing pure-ftpd log indicates the warning:  `pure-ftpd: (?@?) [ERROR] Invalid argument:` due to swalling the next parameter on the argument list.
+
+### TLS Client connection
+
+Pure-FTPd use explicit TLS mode, which means it connects unencrypted on the same ftp port and then client sends "AUTH TLS".
+The self-signed certificate may need to be installed in the local machine `Trusted Root Certification Authority` (windows), depending on client. `lftp` on linux support configuration certificate in `/etc/lftp.conf`.
 
 ### Logs
 
