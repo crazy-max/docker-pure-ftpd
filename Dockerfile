@@ -1,28 +1,27 @@
 # syntax=docker/dockerfile:1
 
 ARG PUREFTPD_VERSION=1.0.50
-ARG ALPINE_VERSION=3.17
-ARG XX_VERSION=1.2.1
+ARG ALPINE_VERSION=3.21
+ARG XX_VERSION=1.6.1
 
 FROM --platform=${BUILDPLATFORM} tonistiigi/xx:${XX_VERSION} AS xx
 
 FROM --platform=${BUILDPLATFORM} crazymax/alpine-s6:${ALPINE_VERSION}-2.2.0.3 AS src
-COPY --from=xx / /
 RUN apk --update --no-cache add git patch
 WORKDIR /src/pure-ftpd
-RUN git init . && git remote add origin "https://github.com/jedisct1/pure-ftpd.git"
 ARG PUREFTPD_VERSION
-RUN git fetch origin "${PUREFTPD_VERSION}" && git checkout -q FETCH_HEAD
+ADD "https://github.com/jedisct1/pure-ftpd.git#${PUREFTPD_VERSION}" .
 COPY patchs /src
 RUN patch -p1 < ../minimal.patch
 
 FROM --platform=${BUILDPLATFORM} crazymax/alpine-s6:${ALPINE_VERSION}-2.2.0.3 AS builder
 COPY --from=xx / /
-RUN apk --update --no-cache add autoconf automake binutils clang14 file make pkgconf tar xz
+RUN apk --update --no-cache add autoconf automake binutils clang file make pkgconf tar xz
 ENV XX_CC_PREFER_LINKER=ld
 ARG TARGETPLATFORM
 RUN xx-apk --no-cache --update add \
     gcc \
+    libldap \
     linux-headers \
     musl-dev \
     libsodium-dev \
