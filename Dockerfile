@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 
 ARG PUREFTPD_VERSION=1.0.50
-ARG ALPINE_VERSION=3.17
-ARG XX_VERSION=1.2.1
+ARG ALPINE_VERSION=3.20
+ARG XX_VERSION=1.4.0
 
 FROM --platform=${BUILDPLATFORM} tonistiigi/xx:${XX_VERSION} AS xx
 
@@ -18,7 +18,7 @@ RUN patch -p1 < ../minimal.patch
 
 FROM --platform=${BUILDPLATFORM} crazymax/alpine-s6:${ALPINE_VERSION}-2.2.0.3 AS builder
 COPY --from=xx / /
-RUN apk --update --no-cache add autoconf automake binutils clang14 file make pkgconf tar xz
+RUN apk --update --no-cache add autoconf automake binutils clang18 file make pkgconf tar xz
 ENV XX_CC_PREFER_LINKER=ld
 ARG TARGETPLATFORM
 RUN xx-apk --no-cache --update add \
