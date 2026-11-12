@@ -11,10 +11,10 @@
 
 ## About
 
-[Pure-FTPd](https://www.pureftpd.org/) Docker image based with MySQL,
-PostgreSQL and LDAP support.
+[Pure-FTPd](https://github.com/jedisct1/pure-ftpd) Docker image based on Alpine
+Linux, with PureDB, MySQL, PostgreSQL and LDAP authentication support.
 
-> [!TIP] 
+> [!TIP]
 > Want to be notified of new releases? Check out 🔔 [Diun (Docker Image Update Notifier)](https://github.com/crazy-max/diun)
 > project!
 
@@ -46,12 +46,12 @@ ___
 
 * Multi-platform image
 * [s6-overlay](https://github.com/just-containers/s6-overlay/) as process supervisor
-* [PureDB](#puredb-authentication-method), [MySQL](#mysql-authentication-method), [PostgreSQL](examples/postgresql) and LDAP support
-* Latest [Pure-FTPd](https://github.com/jedisct1/pure-ftpd) release compiled from source
-* Support of `argon2` and `scrypt` hashing method through [Libsodium](https://libsodium.org/)
-* Logs processed to `stdout` through [socklog-overlay](https://github.com/just-containers/socklog-overlay/)
-* Support of `pure-uploadscript`
-* `PASSIVE_IP` for PASV support automatically resolved
+* [PureDB](#puredb-authentication-method), [MySQL](#mysql-authentication-method), [PostgreSQL](#postgresql-authentication-method) and LDAP support
+* [Pure-FTPd](https://github.com/jedisct1/pure-ftpd) compiled from source
+* Argon2 and scrypt password hashing through [libsodium](https://libsodium.org/)
+* Logs sent to `stdout` through [socklog-overlay](https://github.com/just-containers/socklog-overlay/)
+* Run a script after each upload with `pure-uploadscript`
+* Automatic public IP detection for passive connections
 
 ## Build locally
 
@@ -68,12 +68,12 @@ docker buildx bake image-all
 
 ## Image
 
-| Registry                                                                                         | Image                           |
-|--------------------------------------------------------------------------------------------------|---------------------------------|
-| [Docker Hub](https://hub.docker.com/r/crazymax/pure-ftpd/)                                            | `crazymax/pure-ftpd`                 |
-| [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/pure-ftpd)  | `ghcr.io/crazy-max/pure-ftpd`        |
+| Registry                                                                                             | Image                         |
+|------------------------------------------------------------------------------------------------------|-------------------------------|
+| [Docker Hub](https://hub.docker.com/r/crazymax/pure-ftpd/)                                           | `crazymax/pure-ftpd`          |
+| [GitHub Container Registry](https://github.com/users/crazy-max/packages/container/package/pure-ftpd) | `ghcr.io/crazy-max/pure-ftpd` |
 
-Following platforms for this image are available:
+The image supports the following platforms:
 
 ```
 $ docker buildx imagetools inspect crazymax/pure-ftpd --format "{{json .Manifest}}" | \
@@ -89,30 +89,43 @@ linux/ppc64le
 ## Environment variables
 
 * `TZ`: Timezone assigned to the container (default `UTC`)
-* `AUTH_METHOD`: Authentication method to use. Can be `puredb`, `mysql`, `pgsql` or `ldap` (default `puredb`)
+* `AUTH_METHOD`: Authentication method: `puredb`, `mysql`, `pgsql` or `ldap` (default `puredb`)
 * `SECURE_MODE`: Enable [secure mode](#secure-mode) (default `true`)
-* `PASSIVE_IP`: IP/Host for PASV support (default auto resolved with `dig +short myip.opendns.com @resolver1.opendns.com`)
+* `PASSIVE_IP`: IP address or hostname advertised for passive connections. Defaults to the public IP returned by `dig +short myip.opendns.com @resolver1.opendns.com`.
 * `PASSIVE_PORT_RANGE`: Port range for passive connections (default `30000:30009`)
-* `DB_TIMEOUT`: Time in seconds after which we stop trying to reach the database server. Only used for `mysql` and `pgsql` auth method (default `45`)
-* `UPLOADSCRIPT`: What program/script to run after an upload. It has to be _an absolute filename_. (for example `/data/uploadscript.sh`)
+* `DB_TIMEOUT`: Database startup timeout in seconds, used only with `mysql` and `pgsql` authentication (default `45`)
+* `UPLOADSCRIPT`: Absolute path to a program or script to run after an upload (for example `/data/uploadscript.sh`)
 
-> :warning: Do not set `--uploadscript` flag. It will be added if `UPLOADSCRIPT` is defined.
+> [!IMPORTANT]
+> Set `UPLOADSCRIPT` to the absolute path of a program or script inside the
+> container. The image adds `--uploadscript` automatically; do not add it to
+> `/data/pureftpd.flags` yourself.
 
 ## Volumes
 
-* `/data`: Contains config files and PureDB file
+* `/data`: Configuration files, TLS certificates and the PureDB user database
+
+> [!IMPORTANT]
+> Mount FTP users' home directories separately to persist uploaded files.
+> Mounting `/data` alone does not persist files stored under `/home`.
 
 ## Ports
 
 * `2100`: FTP port
 * `30000-30009`: PASV port range
 
+> [!NOTE]
+> If you change `PASSIVE_PORT_RANGE`, publish the same range on the host and
+> allow it through your firewall. Set `PASSIVE_IP` to an address or hostname
+> reachable by your clients if automatic public IP detection does not suit
+> your network.
+
 ## Usage
 
 ### Docker Compose
 
-Docker compose is the recommended way to run this image. You can use the following
-[compose template](examples/puredb/compose.yml), then run the container:
+Docker Compose is the recommended way to run this image. Save the
+[Compose template](examples/puredb/compose.yml) as `compose.yml`, then run:
 
 ```bash
 docker compose up -d
@@ -124,17 +137,17 @@ docker compose logs -f
 You can also use the following minimal command:
 
 ```bash
-$ docker run -d --name pure-ftpd \
+docker run -d --name pure-ftpd \
   -p 2100:2100 \
   -p 30000-30009:30000-30009 \
   -e "TZ=Europe/Paris" \
-  -v $(pwd)/data:/data \
+  -v "$(pwd)/data:/data" \
   crazymax/pure-ftpd
 ```
 
 ## Upgrade
 
-Recreate the container whenever I push an update:
+Pull the updated image and recreate the container:
 
 ```bash
 docker compose pull
@@ -145,9 +158,9 @@ docker compose up -d
 
 ### Flags
 
-This image uses flags instead of the configuration file to set Pure-FTPd. Some
-[flags are forced](https://github.com/crazy-max/docker-pure-ftpd/blob/55c6f6f0857536faf2d93f8d8227c6fec84200ec/entrypoint.sh#L32-L38)
-but you can pass additional flags in `/data/pureftpd.flags` file:
+This image configures Pure-FTPd with command-line flags. The
+[startup script](rootfs/etc/cont-init.d/01-config.sh) sets the required flags.
+Add other options to `/data/pureftpd.flags`, one per line:
 
 ```
 -d
@@ -157,19 +170,28 @@ but you can pass additional flags in `/data/pureftpd.flags` file:
 --limitrecursion 10000:3
 ```
 
+Restart the container after editing this file. See the upstream
+[Pure-FTPd documentation](https://github.com/jedisct1/pure-ftpd/blob/master/README)
+for available options.
+
 ### Secure mode
 
-`SECURE_MODE` enables
-[specially crafted flags](https://github.com/crazy-max/docker-pure-ftpd/blob/55c6f6f0857536faf2d93f8d8227c6fec84200ec/entrypoint.sh#L44-L56)
-to enforced security of Pure-FTPd.
+`SECURE_MODE=true` enables additional restrictions in the
+[startup script](rootfs/etc/cont-init.d/01-config.sh), including a limit of
+five clients in total and per IP address, blocked file renaming, and blocked
+reads and writes of dotfiles. Set it to `false` to disable this group of flags.
+
+> [!IMPORTANT]
+> Secure mode does not enable encryption. Configure [TLS](#tls-connection)
+> separately to protect credentials and file transfers.
 
 ### PureDB authentication method
 
-Using [PureDB](examples/puredb) authentication method, the container will create a blank password file in
-`/data/pureftpd.passwd` and a initialize a PureDB database in `/data/pureftpd.pdb`. If a password file is
-already available, it will be read on startup and the PureDB database will be updated.
+With [PureDB authentication](examples/puredb), the container creates
+`/data/pureftpd.passwd` if it does not exist and rebuilds `/data/pureftpd.pdb`
+from that password file at startup.
 
-At first execution of the container no user will be available and you will have to create one:
+On the first start, the database is empty. Create a user with:
 
 ```
 $ docker compose exec pureftpd pure-pw useradd foo -u 1003 -g 1005 -d /home/foo -m
@@ -177,22 +199,30 @@ Password:
 Enter it again:
 $ docker compose exec pureftpd pure-pw list
 foo                 /home/foo/./
-$ cat ./data/pureftpd.passwd
-foo:$2a$10$Oqn7I2P7YaGxQrtuydcDKuxmCJqPR7a79EeDy2gChyOGEnYA4UIPK:1003:1005::/home/foo/./::::::::::::
 ```
 
-> User `foo` will be created with uid `1003`, gid `1005` with his home directory located at `/home/foo`.
-> The password will be asked after. More info about local users database:
-> https://github.com/jedisct1/pure-ftpd/blob/master/README.Virtual-Users
+The command prompts for a password and creates the virtual FTP user `foo`
+with UID `1003`, GID `1005`, and home directory `/home/foo`. The `-d` option
+restricts the user to that directory. Choose IDs that match the ownership
+of your mounted files.
+
+> [!TIP]
+> Use `-m` when adding, modifying or deleting users to update the PureDB
+> database immediately. Otherwise, apply changes without restarting with:
+>
+> ```bash
+> docker compose exec pureftpd pure-pw mkdb
+> ```
+
+See the upstream [virtual user documentation](https://github.com/jedisct1/pure-ftpd/blob/master/README.Virtual-Users)
+for password changes, quotas and other account settings.
 
 ### Persist FTP user home
 
-Looking at the previous example, don't forget to persist the home directory through a
-[named or bind mounted volume](https://docs.docker.com/storage/volumes/) like:
+Persist the user's home directory with a volume or bind mount. For the
+previous example, add `./foo:/home/foo` to the Compose configuration:
 
-```bash
-version: "3.2"
-
+```yaml
 services:
   pureftpd:
     image: crazymax/pure-ftpd
@@ -211,14 +241,14 @@ services:
 
 ### MySQL authentication method
 
-A [quick example](examples/mariadb) to use MySQL authentication method is also available using a MariaDB container.
-Before using starting the container, a [MySQL configuration file](examples/mariadb/data/pureftpd-mysql.conf) must
-be available in `/data/pureftpd-mysql.conf`.
+The [MariaDB example](examples/mariadb) demonstrates MySQL authentication.
+Set `AUTH_METHOD=mysql` and provide a [configuration file](examples/mariadb/data/pureftpd-mysql.conf)
+at `/data/pureftpd-mysql.conf` before starting the FTP container.
 
-In the [docker compose example](examples/mariadb) available, the database and the
-[users table](examples/mariadb/users.sql) will be created at first launch.
+The example initializes the database and [users table](examples/mariadb/users.sql)
+when the database container starts with an empty data directory.
 
-To create your first user you can use this one line command:
+Create and inspect a user in the example MariaDB database:
 
 ```
 $ docker compose exec db mysql -u pureftpd -p'asupersecretpassword' -e "INSERT INTO users (User,Password,Uid,Gid,Dir) VALUES ('foo',ENCRYPT('test'),'1003','1005','/home/foo');" pureftpd
@@ -230,79 +260,90 @@ $ docker compose exec db mysql -u pureftpd -p'asupersecretpassword' -e "SELECT *
 +------+---------------+------+------+-----------+
 ```
 
-> User `foo` will be created with uid `1003`, gid `1005` with his home directory located at `/home/foo`. Here we assume
-> `crypt` is the `MySQLCrypt` method and the password `test` is hashed using crypt.
-> More info about MySQL authentication method: https://github.com/jedisct1/pure-ftpd/blob/master/README.MySQL
+> [!NOTE]
+> This example creates `foo` with UID `1003`, GID `1005`, home directory
+> `/home/foo`, and password `test`. It uses MariaDB's `ENCRYPT()` function
+> with `MYSQLCrypt crypt`, as configured in the example.
+
+See the upstream [MySQL/MariaDB documentation](https://github.com/jedisct1/pure-ftpd/blob/master/README.MySQL)
+for supported password hashes and per-user settings.
 
 ### PostgreSQL authentication method
 
-Like MySQL, there is also a [quick example](examples/postgresql) to use PostgreSQL authentication method using a
-PostgreSQL container. And also before starting the container, a
-[PostgreSQL configuration file](examples/postgresql/data/pureftpd-pgsql.conf) must be available
-in `/data/pureftpd-pgsql.conf`.
+The [PostgreSQL example](examples/postgresql) demonstrates PostgreSQL
+authentication. Set `AUTH_METHOD=pgsql` and provide a [configuration file](examples/postgresql/data/pureftpd-pgsql.conf)
+at `/data/pureftpd-pgsql.conf` before starting the FTP container.
 
-In the [docker compose example](examples/postgresql) available, the database and the
-[users table](examples/postgresql/users.sql) will be also created at first launch.
+The example initializes the database and [users table](examples/postgresql/users.sql)
+when the database container starts with an empty data directory.
 
-How add new user with encrypted password?
+Run the following SQL in the `pureftpd` database to create a user with a
+hashed password and explicit UID and GID:
+
 ```sql
-CREATE EXTENSION pgcrypto;
-INSERT INTO "users" ("User", "Password", "Dir") VALUES ('foo', crypt('mypassword', gen_salt('bf')), '/home/foo');
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+INSERT INTO "users" ("User", "Password", "Uid", "Gid", "Dir")
+VALUES ('foo', crypt('mypassword', gen_salt('bf')), 1003, 1005, '/home/foo');
 ```
 
-> More info about PostgreSQL authentication method: https://github.com/jedisct1/pure-ftpd/blob/master/README.PGSQL
+See the upstream [PostgreSQL documentation](https://github.com/jedisct1/pure-ftpd/blob/master/README.PGSQL)
+for supported password hashes and per-user settings.
 
 ### TLS connection
 
-[TLS connections](https://github.com/jedisct1/pure-ftpd/blob/master/README.TLS) require certificates, as well as their
-key. Both can be bundled into a single file. If you have both a `.pem` file and a `.key` file, just concatenate the
-content of the `.key` file to the `.pem` file.
+Place the certificate and its private key in `/data/pureftpd.pem`. If they
+are in separate PEM files, concatenate them into this file.
 
-The certificate needs to be located in `/data/pureftpd.pem` and `--tls <opt>` added to enable TLS connection.
+Add a TLS mode to `/data/pureftpd.flags`. For example, to require encryption
+for both login and file transfers:
 
-To get started, you can create a self-signed certificate with the following command:
-
+```text
+--tls=3
 ```
-docker run --rm -it --entrypoint '' -v $(pwd)/data:/data crazymax/pure-ftpd \
-  openssl dhparam -out /data/pureftpd-dhparams.pem 2048
-docker run --rm -it --entrypoint '' -v $(pwd)/data:/data crazymax/pure-ftpd \
-  openssl req -x509 -nodes -newkey rsa:2048 -sha256 -keyout /data/pureftpd.pem -out /data/pureftpd.pem
+
+The upstream [TLS documentation](https://github.com/jedisct1/pure-ftpd/blob/master/README.TLS)
+defines these modes:
+
+| Mode | Behavior                                                 |
+|------|----------------------------------------------------------|
+| `0`  | Disable TLS (default).                                   |
+| `1`  | Allow both unencrypted and TLS connections.              |
+| `2`  | Require TLS for the control connection, including login. |
+| `3`  | Require TLS for both control and data connections.       |
+
+> [!IMPORTANT]
+> The `--tls` flag requires a numeric value. A bare `--tls` can cause a
+> startup error. Restart the container after changing the flags or certificate.
+
+For testing, generate a self-signed certificate with the following commands.
+Replace `ftp.example.com` with the hostname your clients use:
+
+```bash
+mkdir -p data
+docker run --rm -it --entrypoint openssl -v "$(pwd)/data:/data" crazymax/pure-ftpd dhparam -out /data/pureftpd-dhparams.pem 2048
+docker run --rm -it --entrypoint openssl -v "$(pwd)/data:/data" crazymax/pure-ftpd req -x509 -nodes -newkey rsa:2048 -sha256 -days 365 -keyout /data/pureftpd.pem -out /data/pureftpd.pem -subj "/CN=ftp.example.com" -addext "subjectAltName=DNS:ftp.example.com"
 ```
+
+Configure your FTP client to use **explicit FTP over TLS (FTPS)** on port
+`2100` (or the host port you published). The client connects to the FTP port
+and requests TLS with `AUTH TLS`. With mode `3`, enable encryption for data
+connections in the client as well.
+
+> [!NOTE]
+> A self-signed certificate is not trusted automatically. Verify it before
+> trusting it in your FTP client, or use a certificate issued by a CA that
+> your client trusts.
 
 ### Logs
 
-Logs are displayed through `stdout` using `socklog-overlay`. You can increase verbosity with `-d -d` flags.
+Logs are sent to `stdout` through `socklog-overlay`. Follow them with:
 
+```bash
+docker compose logs -f pureftpd
 ```
-$ docker compose logs -f pureftpd
-Attaching to pureftpd
-pureftpd    | [s6-init] making user provided files available at /var/run/s6/etc...exited 0.
-pureftpd    | [s6-init] ensuring user provided files have correct perms...exited 0.
-pureftpd    | [fix-attrs.d] applying ownership & permissions fixes...
-pureftpd    | [fix-attrs.d] done.
-pureftpd    | [cont-init.d] executing container initialization scripts...
-pureftpd    | [cont-init.d] 01-config.sh: executing...
-pureftpd    | Setting timezone to America/Edmonton...
-pureftpd    | Use PureDB authentication method
-pureftpd    | Flags
-pureftpd    |   Secure:
-pureftpd    |   Additional:
-pureftpd    |   All: --bind 0.0.0.0,2100 --ipv4only --passiveportrange 30000:30009 --noanonymous --createhomedir --nochmod --syslogfacility ftp --forcepassiveip 90.101.64.158 --login puredb:/data/pureftpd.pdb
-pureftpd    | [cont-init.d] 01-config.sh: exited 0.
-pureftpd    | [cont-init.d] 02-service.sh: executing...
-pureftpd    | [cont-init.d] 02-service.sh: exited 0.
-pureftpd    | [cont-init.d] 03-uploadscript.sh: executing...
-pureftpd    | [cont-init.d] 03-uploadscript.sh: exited 0.
-pureftpd    | [cont-init.d] ~-socklog: executing...
-pureftpd    | [cont-init.d] ~-socklog: exited 0.
-pureftpd    | [cont-init.d] done.
-pureftpd    | [services.d] starting services
-pureftpd    | [services.d] done.
-pureftpd    | ftp.info: May 21 18:09:56 pure-ftpd: (?@192.168.0.1) [INFO] New connection from 192.168.0.1
-pureftpd    | ftp.info: May 21 18:09:56 pure-ftpd: (?@192.168.0.1) [INFO] foo is now logged in
-pureftpd    | ftp.notice: May 21 18:10:17 pure-ftpd: (foo@192.168.0.1) [NOTICE] /home/foo//unlock.bin uploaded  (1024 bytes, 448.83KB/sec)
-...
-```
+
+For more detail, add `-d` twice on separate lines in `/data/pureftpd.flags`
+and restart the container.
 
 ## Contributing
 
