@@ -50,7 +50,7 @@ RUN <<EOT
     --with-quotas \
     --with-ratios \
     --with-throttling \
-    --with-tls=$(xx-info sysroot)usr \
+    --with-tls \
     --with-uploadscript \
     --with-brokenrealpath \
     --with-certfile=/data/pureftpd.pem
