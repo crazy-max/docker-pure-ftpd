@@ -33,7 +33,7 @@ COPY --from=src /src/pure-ftpd /src
 RUN <<EOT
   set -ex
   ./autogen.sh
-  ./configure \
+  CC=xx-clang ./configure \
     --host=$(xx-clang --print-target-triple) \
     --prefix=/out \
     --without-ascii \
