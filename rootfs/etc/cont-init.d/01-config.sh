@@ -45,6 +45,7 @@ fi
 # Secure mode
 SECURE_FLAGS=""
 if [ "$SECURE_MODE" = "true" ]; then
+  SECURE_FLAGS="$SECURE_FLAGS --chrooteveryone"
   SECURE_FLAGS="$SECURE_FLAGS --maxclientsnumber 5"
   SECURE_FLAGS="$SECURE_FLAGS --maxclientsperip 5"
   SECURE_FLAGS="$SECURE_FLAGS --antiwarez"

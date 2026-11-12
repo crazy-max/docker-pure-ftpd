@@ -158,9 +158,10 @@ docker compose up -d
 
 ### Flags
 
-This image configures Pure-FTPd with command-line flags. The
-[startup script](rootfs/etc/cont-init.d/01-config.sh) sets the required flags.
-Add other options to `/data/pureftpd.flags`, one per line:
+This image configures Pure-FTPd with command-line flags and does not read
+`/etc/pure-ftpd.conf`. The [startup script](rootfs/etc/cont-init.d/01-config.sh)
+sets the required flags. Add other options to `/data/pureftpd.flags`, one per
+line:
 
 ```
 -d
@@ -178,8 +179,9 @@ for available options.
 
 `SECURE_MODE=true` enables additional restrictions in the
 [startup script](rootfs/etc/cont-init.d/01-config.sh), including a limit of
-five clients in total and per IP address, blocked file renaming, and blocked
-reads and writes of dotfiles. Set it to `false` to disable this group of flags.
+five clients in total and per IP address, confinement to users' home
+directories, blocked file renaming, and blocked reads and writes of dotfiles.
+Set it to `false` to disable this group of flags.
 
 > [!IMPORTANT]
 > Secure mode does not enable encryption. Configure [TLS](#tls-connection)
