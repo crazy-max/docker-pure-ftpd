@@ -43,6 +43,19 @@ jobs:
         env:
           DEFAULT_TAG: ${{ env.BUILD_TAG }}
       -
+        name: Prepare TLS
+        run: |
+          docker compose run --rm --no-deps --entrypoint sh pureftpd -ec '
+            openssl req -x509 -nodes -newkey rsa:2048 -sha256 -days 1 \
+              -subj /CN=localhost -addext subjectAltName=DNS:localhost \
+              -keyout /data/pureftpd.pem -out /data/pureftpd.pem
+            printf "%s\n" "--tls 2" > /data/pureftpd.flags
+          '
+        working-directory: test
+        env:
+          PUREFTPD_IMAGE: ${{ env.BUILD_TAG }}
+          PUREFTPD_CONTAINER: ${{ env.CONTAINER_NAME }}
+      -
         name: Start
         run: |
           docker compose up -d
@@ -57,6 +70,15 @@ jobs:
           name: ${{ env.CONTAINER_NAME }}
           log_check: "[services.d] done"
           timeout: 120
+      -
+        name: Check TLS
+        run: |
+          docker exec "${CONTAINER_NAME}" sh -ec '
+            printf "QUIT\r\n" | timeout 15 openssl s_client \
+              -starttls ftp -connect localhost:2100 -servername localhost \
+              -CAfile /data/pureftpd.pem -verify_return_error \
+              -verify_hostname localhost -brief
+          '
       -
         name: Logs
         if: always()
