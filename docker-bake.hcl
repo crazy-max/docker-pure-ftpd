@@ -2,10 +2,6 @@ variable "DEFAULT_TAG" {
   default = "pure-ftpd:local"
 }
 
-variable "DOCKERFILE" {
-  default = "Dockerfile"
-}
-
 // Special target: https://github.com/docker/metadata-action#bake-definition
 target "docker-metadata-action" {
   tags = ["${DEFAULT_TAG}"]
@@ -18,7 +14,6 @@ group "default" {
 
 target "image" {
   inherits = ["docker-metadata-action"]
-  dockerfile = DOCKERFILE
 }
 
 target "image-local" {
@@ -33,7 +28,6 @@ target "image-all" {
     "linux/arm/v6",
     "linux/arm/v7",
     "linux/arm64",
-    "linux/386",
     "linux/ppc64le"
   ]
 }
