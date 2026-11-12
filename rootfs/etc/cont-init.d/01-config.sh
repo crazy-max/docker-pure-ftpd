@@ -75,12 +75,11 @@ if [ "$AUTH_METHOD" = "mysql" ]; then
   DB_PORT=$(extractFromConf "MYSQLPort" ${PFTPD_MYSQL_CONF})
   DB_USER=$(extractFromConf "MYSQLUser" ${PFTPD_MYSQL_CONF})
   DB_PASSWORD=$(extractFromConf "MYSQLPassword" ${PFTPD_MYSQL_CONF})
-  DB_CMD="mysql -h ${DB_HOST} -P ${DB_PORT} -u ${DB_USER} "-p${DB_PASSWORD}""
-  #echo "DB_CMD=$DB_CMD"
 
   echo "Waiting ${DB_TIMEOUT}s for MySQL database to be ready..."
   counter=1
-  while ! ${DB_CMD} -e "show databases;" > /dev/null 2>&1; do
+  while ! mariadb -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" "-p$DB_PASSWORD" \
+    -e "show databases;" > /dev/null 2>&1; do
       sleep 1
       counter=$((counter + 1))
       if [ ${counter} -gt "${DB_TIMEOUT}" ]; then
@@ -89,7 +88,7 @@ if [ "$AUTH_METHOD" = "mysql" ]; then
       fi;
   done
   echo "MySQL database ready!"
-  unset DB_USER DB_PASSWORD DB_CMD
+  unset DB_USER DB_PASSWORD
 
 # PostgreSQL auth
 elif [ "$AUTH_METHOD" = "pgsql" ]; then
@@ -106,12 +105,11 @@ elif [ "$AUTH_METHOD" = "pgsql" ]; then
   DB_PASSWORD=$(extractFromConf "PGSQLPassword" ${PFTPD_PGSQL_CONF})
   DB_NAME=$(extractFromConf "PGSQLDatabase" ${PFTPD_PGSQL_CONF})
   export PGPASSWORD=${DB_PASSWORD}
-  DB_CMD="psql --host=${DB_HOST} --port=${DB_PORT} --username=${DB_USER} -lqt"
-  #echo "DB_CMD=$DB_CMD"
 
   echo "Waiting ${DB_TIMEOUT}s for database to be ready..."
   counter=1
-  while ${DB_CMD} | cut -d \| -f 1 | grep -qw "${DB_NAME}" > /dev/null 2>&1; [ $? -ne 0 ]; do
+  while ! psql --host="$DB_HOST" --port="$DB_PORT" --username="$DB_USER" -lqt \
+    | cut -d \| -f 1 | grep -qw "$DB_NAME" > /dev/null 2>&1; do
     sleep 1
     counter=$((counter + 1))
     if [ ${counter} -gt "${DB_TIMEOUT}" ]; then
@@ -120,7 +118,7 @@ elif [ "$AUTH_METHOD" = "pgsql" ]; then
     fi;
   done
   echo "PostgreSQL database ready!"
-  unset DB_USER DB_PASSWORD DB_CMD PGPASSWORD
+  unset DB_USER DB_PASSWORD PGPASSWORD
 
 # LDAP auth
 elif [ "$AUTH_METHOD" = "ldap" ]; then
