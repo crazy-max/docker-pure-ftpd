@@ -253,8 +253,8 @@ when the database container starts with an empty data directory.
 Create and inspect a user in the example MariaDB database:
 
 ```
-$ docker compose exec db mysql -u pureftpd -p'asupersecretpassword' -e "INSERT INTO users (User,Password,Uid,Gid,Dir) VALUES ('foo',ENCRYPT('test'),'1003','1005','/home/foo');" pureftpd
-$ docker compose exec db mysql -u pureftpd -p'asupersecretpassword' -e "SELECT * FROM users;" pureftpd
+$ docker compose exec db mariadb -u pureftpd -p'asupersecretpassword' -e "INSERT INTO users (User,Password,Uid,Gid,Dir) VALUES ('foo',ENCRYPT('test'),'1003','1005','/home/foo');" pureftpd
+$ docker compose exec db mariadb -u pureftpd -p'asupersecretpassword' -e "SELECT * FROM users;" pureftpd
 +------+---------------+------+------+-----------+
 | User | Password      | Uid  | Gid  | Dir       |
 +------+---------------+------+------+-----------+

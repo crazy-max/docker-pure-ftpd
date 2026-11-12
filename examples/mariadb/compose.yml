@@ -30,6 +30,7 @@ services:
     environment:
       - "TZ=Europe/Paris"
       - "AUTH_METHOD=mysql"
+      - "MARIADB_TLS_DISABLE_PEER_VERIFICATION=1"
     restart: always
 
 networks:
