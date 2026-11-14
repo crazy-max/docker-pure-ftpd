@@ -68,8 +68,16 @@ jobs:
         uses: crazy-max/.github/.github/actions/container-logs-check@f91220cba053bd54299ba645a599ee8ed436f222 # v1.11.0
         with:
           name: ${{ env.CONTAINER_NAME }}
-          log_check: "[services.d] done"
+          log_check: "service pure-ftpd successfully started"
           timeout: 120
+      -
+        name: Check services
+        run: |
+          docker compose exec -T pureftpd sh -s < services.sh
+        working-directory: test
+        env:
+          PUREFTPD_IMAGE: ${{ env.BUILD_TAG }}
+          PUREFTPD_CONTAINER: ${{ env.CONTAINER_NAME }}
       -
         name: Check TLS
         run: |
@@ -79,6 +87,12 @@ jobs:
               -CAfile /data/pureftpd.pem -verify_return_error \
               -verify_hostname localhost -brief
           '
+      -
+        name: Check daemon failure
+        run: |
+          docker update --restart=no "${CONTAINER_NAME}"
+          docker exec "${CONTAINER_NAME}" s6-svc -k /run/service/pure-ftpd
+          test "$(timeout 30 docker wait "${CONTAINER_NAME}")" = "137"
       -
         name: Logs
         if: always()

@@ -1,0 +1,3 @@
+#!/command/with-contenv sh
+
+exec pure-uploadscript -p /var/run/pure-uploadscript.pid -r "${UPLOADSCRIPT}"

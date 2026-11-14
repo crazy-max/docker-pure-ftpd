@@ -1,0 +1,3 @@
+#!/command/with-contenv sh
+
+exec execlineb -c "pure-ftpd ${PUREFTPD_FLAGS}"

@@ -49,7 +49,7 @@ ___
 * [PureDB](#puredb-authentication-method), [MySQL](#mysql-authentication-method), [PostgreSQL](#postgresql-authentication-method) and LDAP support
 * [Pure-FTPd](https://github.com/jedisct1/pure-ftpd) compiled from source
 * Argon2 and scrypt password hashing through [libsodium](https://libsodium.org/)
-* Logs sent to `stdout` through [socklog-overlay](https://github.com/just-containers/socklog-overlay/)
+* FTP logs sent to `stdout` through native s6 services
 * Run a script after each upload with `pure-uploadscript`
 * Automatic public IP detection for passive connections
 
@@ -338,7 +338,7 @@ connections in the client as well.
 
 ### Logs
 
-Logs are sent to `stdout` through `socklog-overlay`. Follow them with:
+FTP logs are sent to `stdout` through native s6 services. Follow them with:
 
 ```bash
 docker compose logs -f pureftpd

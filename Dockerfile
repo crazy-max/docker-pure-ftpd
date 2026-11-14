@@ -6,7 +6,7 @@ ARG XX_VERSION=1.10.0
 
 FROM --platform=${BUILDPLATFORM} tonistiigi/xx:${XX_VERSION} AS xx
 
-FROM --platform=${BUILDPLATFORM} crazymax/alpine-s6:${ALPINE_VERSION}-2.2.0.3 AS src
+FROM --platform=${BUILDPLATFORM} alpine:${ALPINE_VERSION} AS src
 COPY --from=xx / /
 RUN apk --update --no-cache add git
 WORKDIR /src/pure-ftpd
@@ -14,7 +14,7 @@ RUN git init . && git remote add origin "https://github.com/jedisct1/pure-ftpd.g
 ARG PUREFTPD_VERSION
 RUN git fetch origin "${PUREFTPD_VERSION}" && git checkout -q FETCH_HEAD
 
-FROM --platform=${BUILDPLATFORM} crazymax/alpine-s6:${ALPINE_VERSION}-2.2.0.3 AS builder
+FROM --platform=${BUILDPLATFORM} alpine:${ALPINE_VERSION} AS builder
 COPY --from=xx / /
 RUN apk --update --no-cache add autoconf automake binutils clang file make pkgconf tar xz
 ENV XX_CC_PREFER_LINKER=ld
@@ -60,10 +60,10 @@ RUN <<EOT
   file /out/sbin/pure-ftpd
 EOT
 
-FROM crazymax/alpine-s6:${ALPINE_VERSION}-2.2.0.3
+FROM alpine:${ALPINE_VERSION}
 
 ENV S6_BEHAVIOUR_IF_STAGE2_FAILS="2" \
-  SOCKLOG_TIMESTAMP_FORMAT="" \
+  S6_STAGE2_HOOK="/etc/s6-overlay/scripts/runtime-bundles" \
   PURE_PASSWDFILE="/data/pureftpd.passwd" \
   PURE_DBFILE="/data/pureftpd.pdb" \
   TZ="UTC"
@@ -79,9 +79,9 @@ RUN apk --update --no-cache add \
     openldap-clients \
     openssl \
     postgresql-client \
+    s6-overlay \
     tzdata \
     zlib \
-  && rm -f /etc/socklog.rules/* \
   && rm -rf /tmp/*
 
 COPY --from=builder /out /
