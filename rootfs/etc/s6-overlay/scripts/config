@@ -1,5 +1,4 @@
-#!/usr/bin/with-contenv sh
-# shellcheck shell=sh
+#!/bin/sh
 
 TZ=${TZ:-UTC}
 AUTH_METHOD=${AUTH_METHOD:-puredb}
@@ -156,4 +155,4 @@ echo "  Secure:$SECURE_FLAGS"
 echo "  Additional:$ADD_FLAGS"
 echo "  All:$FLAGS"
 
-printf "%s" "$FLAGS" > /var/run/s6/container_environment/PUREFTPD_FLAGS
+printf "%s" "$FLAGS" > /run/s6/container_environment/PUREFTPD_FLAGS
